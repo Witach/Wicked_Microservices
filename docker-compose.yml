@@ -146,6 +146,8 @@ services:
       - "9093"
     depends_on:
       - zookeeper
+#    profiles:
+#      - kafka
 
   zookeeper:
     image: bitnami/zookeeper:latest
@@ -153,16 +155,18 @@ services:
       - ALLOW_ANONYMOUS_LOGIN=yes
     networks:
       - social-app
-  kafka-client:
-    image: bitnami/kafka:latest
-    networks:
-      - social-app
-    environment:
-      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
-    command:
-      - kafka-topics.sh --list  --bootstrap-server kafka:9092
-    depends_on:
-      - zookeeper
+#    profiles:
+#      - kafka
+#  kafka-client:
+#    image: bitnami/kafka:latest
+#    networks:
+#      - social-app
+#    environment:
+#      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+#    command:
+#      - kafka-topics.sh --list  --bootstrap-server kafka:9092
+#    depends_on:
+#      - zookeeper
 
 networks:
   social-app:

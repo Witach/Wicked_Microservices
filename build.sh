@@ -1,0 +1,2 @@
+./gradlew feed-app:clean post-app:clean profile-app:clean registry-server:clean config-server:clean
+./gradlew feed-app:bootJar post-app:bootJar profile-app:bootJar registry-server:bootJar  config-server:bootJar

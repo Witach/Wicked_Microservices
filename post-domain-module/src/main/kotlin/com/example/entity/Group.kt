@@ -23,12 +23,12 @@ class Group(
 
     public fun addProfile(profile: UUID): ProfileAddedEvent {
         profiles.add(profile)
-        return ProfileAddedEvent(this)
+        return ProfileAddedEvent(groupInt, profile)
     }
 
     public fun removeProfile(profile: UUID): RemoveProfileEvent {
         profiles.remove(profile);
-        return RemoveProfileEvent(this)
+        return RemoveProfileEvent(groupInt, profile)
     }
 
     public fun addAdministrator(admin: UUID): AdministratorAddedEvent {

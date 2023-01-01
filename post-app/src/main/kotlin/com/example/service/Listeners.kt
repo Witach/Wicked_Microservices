@@ -9,7 +9,6 @@ import com.example.servicechassis.KafkaClient
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.springframework.kafka.annotation.KafkaListener
-import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Service
 import java.util.*
 

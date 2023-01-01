@@ -1,0 +1,38 @@
+spring:
+  config:
+    import: "optional:configserver:"
+  application:
+    name: profile-app
+  cloud:
+    config:
+      discovery:
+        enabled: true
+        service-id: config-server
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8085/auth/realms/SocialApp
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+auth-server:
+  client-id: admin-cli
+  client-secret: hz3dTslTMmpr5QCepUA7Dc7mIlanyt7w
+  grant-type: client_credentials
+  uri: http://localhost:8085/
+
+kafka:
+  bootstrapServer: localhost:9092
+  topics:
+    - profile-created-event
+    - profile-updated-event
+    - profile-unfolowed-event
+    - profile-folowed-event
+    - profile-removedfromgroup-event
+    - user-updated-event
+    - user-created-event
+    - user-deleted-event

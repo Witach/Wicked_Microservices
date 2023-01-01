@@ -1,0 +1,28 @@
+context:
+  initializer:
+    classes:
+      com.example.BeanInitializer
+
+server:
+  port: 8761
+
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+spring:
+  application:
+    name: registry-server
+
+auth-server:
+  client-id: admin-cli
+  client-secret: hz3dTslTMmpr5QCepUA7Dc7mIlanyt7w
+  grant-type: client_credentials
+  uri: http://localhost:8085/

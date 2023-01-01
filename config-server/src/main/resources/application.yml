@@ -1,0 +1,47 @@
+context:
+  initializer:
+    classes:
+      com.example.BeanInitializer
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+
+
+server:
+  port: 8888
+
+spring:
+  application:
+    name: config-server
+
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/Witach/socialapp-config
+          skipSslValidation: true
+          clone-on-start: true
+          search-paths: '{application}'
+          default-label: "main"
+logging:
+  level:
+    org:
+      springframework:
+        cloud: debug
+        web: debug
+
+encrypt:
+  key-store:
+    location: classpath:/server.jks
+    password: password
+    alias: myAlias
+    secret: password

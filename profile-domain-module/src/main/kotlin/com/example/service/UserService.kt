@@ -41,7 +41,6 @@ class UserService(
             username = createUserProjection.username!!,
             birthday = createUserProjection.birthday,
             userId = user.userId,
-            avatar = createUserProjection.avatar ?: "",
         ))
 
         eventPublisher.publish(UserCreatedEvent(user, profile))

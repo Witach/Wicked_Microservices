@@ -6,7 +6,6 @@ import java.util.*
 data class CreateUserProjection(
     val username: String?,
     val birthday: LocalDate?,
-    val avatar: String?,
     var email: String?,
     var passowrd: String?
 )

@@ -37,9 +37,9 @@ class ProfileRepositoryImpl(val profileMongoRepository: ProfileMongoRepository):
 }
 
 fun Profile.toProfileTable(): ProfileTable = ProfileTable(
-    profileID, UserTable(userId, this.username),  username, birthday, groups, followed, avatar
+    profileID, UserTable(userId, this.username),  username, birthday, groups, followed
 )
 
 fun ProfileTable.toProfile(): Profile = Profile(
-    profileID, user.email, birthday, user.userId, groups, followed, avatar
+    profileID, user.email, birthday, user.userId, groups, followed
 )

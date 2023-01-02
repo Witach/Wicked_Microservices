@@ -12,8 +12,8 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":post-domain-module"))
     implementation(project(":service-chassis"))
+    implementation(project(":post-domain-module"))
 }
 
 tasks.getByName<Test>("test") {

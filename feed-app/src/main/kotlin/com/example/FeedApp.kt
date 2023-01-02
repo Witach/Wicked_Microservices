@@ -6,8 +6,11 @@ import com.example.servicechassis.*
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.cloud.openfeign.EnableFeignClients
+import org.springframework.context.annotation.Configuration
 import org.springframework.context.support.beans
 import org.springframework.core.env.get
+import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 
 @EnableFeignClients
 @SpringBootApplication

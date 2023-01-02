@@ -9,6 +9,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.runApplication
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.context.support.beans
+import org.springframework.core.env.ConfigurableEnvironment
 import org.springframework.core.env.get
 
 @EnableFeignClients
@@ -18,25 +19,28 @@ class ProfileApp
 
 fun main(args: Array<String>) {
     runApplication<ProfileApp>(*args) {
-        beans {
-            beanDefinitions(this)
-            kafkaConsumer(this)
-            kafkaProducers(this, env["kafka.topics"] as List<String>)
-            bean<ProfileService>()
-            bean<UserService>()
-            profile("dev") {
-                bean {
-                    filterChain(ref(), ::devRestrictions)
+        addInitializers(
+            beans {
+                beanDefinitions(this)
+                kafkaConsumer(this)
+                kafkaProducers(this, extractList(env, "kafka.topics"))
+                bean<ProfileService>()
+                bean<UserService>()
+                profile("dev") {
+                    bean {
+                        filterChain(ref(), ::devRestrictions)
+                    }
                 }
-            }
-            profile("prod") {
-                bean {
-                    filterChain(ref(), ::prodRestriction)
+                profile("prod") {
+                    bean {
+                        filterChain(ref(), ::prodRestriction)
+                    }
                 }
+                bean {
+                    routes(ref(), ref())
+                }
+
             }
-            bean {
-                routes(ref(), ref())
-            }
-        }
+        )
     }
 }

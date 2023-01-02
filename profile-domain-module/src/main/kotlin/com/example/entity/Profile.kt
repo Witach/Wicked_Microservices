@@ -14,7 +14,6 @@ class Profile(
     val userId: UUID,
     val groups: MutableSet<UUID> = mutableSetOf(),
     val followed: MutableSet<UUID> = mutableSetOf(),
-    var avatar: String,
 ): DDDEntity() {
     override val entityId: UUID?
         get() = profileID
@@ -40,7 +39,6 @@ class Profile(
     }
 
     fun edit(profile: ProfileEditProjection): ProfileEdited {
-        avatar = profile.avatar ifBlank avatar
         birthday = profile.birthday ?: birthday
         username = profile.username ifBlank (username ?: "")
         return ProfileEdited(this)

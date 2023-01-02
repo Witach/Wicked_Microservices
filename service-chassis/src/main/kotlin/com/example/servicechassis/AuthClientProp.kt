@@ -9,11 +9,11 @@ import org.springframework.context.annotation.Configuration
 @ConstructorBinding
 @ConfigurationProperties("auth-server")
 data class AuthClientProp(
-    val clientId: String,
-    val clientSecret: String,
-    val grantType: String,
-    val uri: String,
-    val authCode: String
+    var clientId: String,
+    var clientSecret: String,
+    var grantType: String,
+    var uri: String,
+    var authCode: String
 )
 
 

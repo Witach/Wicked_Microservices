@@ -12,6 +12,7 @@ import org.example.DomainEvent
 import org.example.EventPublisher
 import org.springframework.boot.autoconfigure.kafka.DefaultKafkaProducerFactoryCustomizer
 import org.springframework.context.support.BeanDefinitionDsl
+import org.springframework.core.env.ConfigurableEnvironment
 import org.springframework.core.env.get
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory
 import org.springframework.kafka.config.KafkaListenerContainerFactory
@@ -108,4 +109,14 @@ fun eventPublisher(topic: String, kafka: KafkaTemplate<String, String>): EventPu
             kafka.send(topic, ObjectMapper().writeValueAsString(domainEvent))
         }
     }
+}
+
+fun extractList(env: ConfigurableEnvironment, key: String): List<String> {
+    var list = mutableListOf<String>()
+    var i = 0
+    while (env["$key[$i]"] != null) {
+        list.add(env["$key[$i]"]!!)
+        i++
+    }
+    return list
 }

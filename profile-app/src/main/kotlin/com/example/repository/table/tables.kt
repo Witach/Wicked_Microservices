@@ -14,7 +14,6 @@ data class ProfileTable(
     var birthday: LocalDate?,
     val groups: MutableSet<UUID> = mutableSetOf(),
     val followed: MutableSet<UUID> = mutableSetOf(),
-    var avatar: String,
 )
 
 @Document("users")

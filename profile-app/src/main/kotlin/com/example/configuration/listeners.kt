@@ -7,13 +7,10 @@ import com.example.service.ProfileService
 import com.example.service.UserService
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.kafka.annotation.KafkaListener
-import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Service
 import java.util.*
 
-@Service
-class Listeners(val kafkaTemplate: KafkaTemplate<String, String>,
-                val objectMapper: ObjectMapper,
+class Listeners(val objectMapper: ObjectMapper,
                 val profileService: ProfileService,
                 val userService: UserService) {
 

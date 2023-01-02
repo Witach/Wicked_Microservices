@@ -12,7 +12,6 @@ import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Service
 import java.util.*
 
-@Service
 class Listeners(val objectMapper: ObjectMapper,
                 val commentService: CommentService,
                 val groupPostService: GroupPostService,

@@ -28,7 +28,7 @@ public class CommentService(
                     sentTime = LocalDateTime.now()
                 )
             )
-            eventPublisher.publish(CommentCreatedEvent(createdComment))
+            eventPublisher.publish(CommentCreatedEvent(createdComment), "comment-created-event")
         } else {
             throw  throw EntityNotFoundException(Post::class.java, comment.postId)
         }
@@ -36,14 +36,14 @@ public class CommentService(
 
     fun deleteComment(commentId: UUID) {
         commentRepository.deleteById(commentId)
-        eventPublisher.publish(CommentDeletedEvent(commentId))
+        eventPublisher.publish(CommentDeletedEvent(commentId), "comment-deleted-event")
     }
 
     fun addReply(commentId: UUID, reply: ReplyCreateProjection) {
         commentRepository.findById(commentId)?.also {
             val createEvent = it.addReply(reply)
             commentRepository.save(it)
-            eventPublisher.publish(createEvent)
+            eventPublisher.publish(createEvent, "reply-created-event")
         } ?: throw EntityNotFoundException(Comment::class.java, commentId)
     }
 
@@ -51,7 +51,7 @@ public class CommentService(
         commentRepository.findById(commentId)?.also {
             val event = it.editReply(reply)
             commentRepository.save(it)
-            eventPublisher.publish(event)
+            eventPublisher.publish(event, "reply-edited-event")
         } ?: throw EntityNotFoundException(Comment::class.java, commentId)
 
     }
@@ -60,7 +60,7 @@ public class CommentService(
         commentRepository.findById(commentId)?.also {
             val event = it.removeReply(reply)
             commentRepository.save(it)
-            eventPublisher.publish(event)
+            eventPublisher.publish(event, "reply-deleted-event")
         } ?: throw EntityNotFoundException(Comment::class.java, commentId)
     }
 }

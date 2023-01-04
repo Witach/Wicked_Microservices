@@ -1,6 +1,7 @@
 package org.example
 
 import java.sql.Timestamp
+import java.util.Objects
 import java.util.UUID
 
 interface AuthServerClient {
@@ -36,13 +37,13 @@ data class CredentialDto(
 
 
 data class UserFetched(
-    val id : UUID? = null,
-    val createdTimestamp: Timestamp? = null,
+    val id : String? = null,
+    val createdTimestamp: String? = null,
     val username: String? = null,
-    val enabled: Boolean? = null,
-    val emailVerified: Boolean? = null,
+    val enabled: String? = null,
+    val emailVerified: String? = null,
     val firstName: String? = null,
     val lastName: String? = null,
     val email: String? = null,
-    val notBefore: Int? = null,
+    val notBefore: String? = null,
 )

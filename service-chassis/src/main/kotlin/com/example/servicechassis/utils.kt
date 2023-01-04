@@ -81,11 +81,7 @@ fun kafkaProducers(dsl: BeanDefinitionDsl, topics: List<String>) {
                 VALUE_SERIALIZER_CLASS_CONFIG to Serializer<Any>{ topic, data -> ObjectMapper().writeValueAsBytes(data) }
         ))
     }
-    dsl.bean {
-        topics.forEach {
-            eventPublisher(it, ref())
-        }
-    }
+    dsl.bean<KafkaClient>()
 }
 
 fun kafkaConsumer(dsl: BeanDefinitionDsl) {
@@ -103,16 +99,8 @@ fun kafkaConsumer(dsl: BeanDefinitionDsl) {
     }
 }
 
-fun eventPublisher(topic: String, kafka: KafkaTemplate<String, String>): EventPublisher {
-    return object : EventPublisher {
-        override fun publish(domainEvent: DomainEvent<*>) {
-            kafka.send(topic, ObjectMapper().writeValueAsString(domainEvent))
-        }
-    }
-}
-
 fun extractList(env: ConfigurableEnvironment, key: String): List<String> {
-    var list = mutableListOf<String>()
+    val list = mutableListOf<String>()
     var i = 0
     while (env["$key[$i]"] != null) {
         list.add(env["$key[$i]"]!!)

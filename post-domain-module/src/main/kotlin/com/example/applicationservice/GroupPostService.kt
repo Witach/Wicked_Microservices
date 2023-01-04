@@ -37,14 +37,14 @@ public class GroupPostService(
                 sentTime = LocalDateTime.now(),
             )
         )
-        eventPublisher.publish(GroupPostAddedEvent(groupPost))
+        eventPublisher.publish(GroupPostAddedEvent(groupPost), "group-post-added-event")
     }
 
     public fun removeGroupPost(postId: UUID) {
         groupPostRepository.findById(postId)?.also {
             it.postId?.let(groupPostRepository::deleteById)
             it.comments.let(commentRepository::removeAll)
-            eventPublisher.publish(GroupPostRemovedEvent(it))
+            eventPublisher.publish(GroupPostRemovedEvent(it), "group-post-removed-event")
         } ?: throw EntityNotFoundException(GroupPost::class.java, postId)
     }
 
@@ -52,7 +52,7 @@ public class GroupPostService(
         groupPostRepository.findById(postUUID)?.let {
             it.editText(text)
             val groupPost = groupPostRepository.save(it)
-            eventPublisher.publish(GroupPostEditedEvent(groupPost))
+            eventPublisher.publish(GroupPostEditedEvent(groupPost), "group-post-edited-event")
         } ?: throw EntityNotFoundException(GroupPost::class.java, postUUID)
     }
 

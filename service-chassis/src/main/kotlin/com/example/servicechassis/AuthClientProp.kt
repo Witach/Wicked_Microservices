@@ -13,7 +13,8 @@ data class AuthClientProp(
     var clientSecret: String,
     var grantType: String,
     var uri: String,
-    var authCode: String
+    var authCode: String,
+    var host: String
 )
 
 

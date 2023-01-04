@@ -14,7 +14,7 @@ import java.util.*
 
 fun routes(profileService: ProfileService, userService: UserService): RouterFunction<ServerResponse>{
     return router {
-        "profile".nest {
+        path("profile").nest {
             PUT("{profileId}") {
                 ok().body(
                     profileService.editProfile(
@@ -65,29 +65,42 @@ fun routes(profileService: ProfileService, userService: UserService): RouterFunc
                     )
                 )
             }
-            "/user".nest {
-                POST("") {
-                    ok().body(
-                        userService.registerNewUser(
-                            it.body()
-                        )
+
+        }
+        path("/user").nest {
+            POST("") {
+                ok().body(
+                    userService.registerNewUser(
+                        it.body()
                     )
-                }
-                PUT("/{userId}") {
-                    ok().body(
-                        userService.editUser(
-                            it.map("userId"),
-                            it.body()
-                        )
+                )
+            }
+            GET("/{userId}") {
+                ok().body(
+                    userService.getUser(
+                        it.map("userId")
                     )
-                }
-                DELETE("/{userId}") {
-                    ok().body(
-                        userService.removeUser(
-                            it.map("userId")
-                        )
+                )
+            }
+            GET("") {
+                ok().body(
+                    userService.getAllUsers()
+                )
+            }
+            PUT("/{userId}") {
+                ok().body(
+                    userService.editUser(
+                        it.map("userId"),
+                        it.body()
                     )
-                }
+                )
+            }
+            DELETE("/{userId}") {
+                ok().body(
+                    userService.removeUser(
+                        it.map("userId")
+                    )
+                )
             }
         }
     }

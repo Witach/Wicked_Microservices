@@ -18,7 +18,7 @@ class ProfileService(
         profileRepository.findById(profileId)?.also {
             val event = it.edit(profile)
             profileRepository.save(it)
-            eventPublisher.publish(event)
+            eventPublisher.publish(event, "profile-edited-event")
         } ?: throw EntityNotFoundException(Profile::class.java, profileId)
     }
 
@@ -30,7 +30,7 @@ class ProfileService(
             sessionStorage.throwIfNoPermission(it.userId)
             val event = it.addGroup(groupUUID)
             profileRepository.save(it)
-            eventPublisher.publish(event)
+            eventPublisher.publish(event, "profile-added-to-group")
         }
     }
 
@@ -42,7 +42,7 @@ class ProfileService(
             sessionStorage.throwIfNoPermission(it.userId)
             val event = it.removeGroup(groupUUID)
             profileRepository.save(it)
-            eventPublisher.publish(event)
+            eventPublisher.publish(event, "profile-removed-from-group")
         }
     }
 
@@ -53,7 +53,7 @@ class ProfileService(
         profileRepository.findById(profileId)?.also {
             val event = it.addFollowedProfile(profileToFollow)
             profileRepository.save(it)
-            eventPublisher.publish(event)
+            eventPublisher.publish(event, "profile-started-to-follow")
         } ?: throw EntityNotFoundException(Profile::class.java, profileId)
     }
 
@@ -65,7 +65,7 @@ class ProfileService(
         profileRepository.findById(profile)?.also {
             val event = it.removeFollowedProfile(profileToFollow)
             profileRepository.save(it)
-            eventPublisher.publish(event)
+            eventPublisher.publish(event, "profile-removed-followed-profile")
         } ?: throw EntityNotFoundException(Profile::class.java, profile)
     }
 

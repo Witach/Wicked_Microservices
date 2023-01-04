@@ -1,5 +1,6 @@
 package com.example.servicechassis
 
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.example.AuthServerClient
 import org.example.CreateUserDto
@@ -16,7 +17,7 @@ import org.springframework.web.client.RestTemplate
 import org.springframework.web.client.getForEntity
 import java.util.*
 
-inline fun <reified T> typeReference() = object : ParameterizedTypeReference<T>() {}
+//inline fun <reified T> typeReference() = object : TypeReference<T>() {}
 
 class AuthServerClientImpl(val authProp: AuthClientProp,
                            private val authClientResponseErrorHandler: AuthClientResponseErrorHandler): AuthServerClient {
@@ -27,22 +28,34 @@ class AuthServerClientImpl(val authProp: AuthClientProp,
         println(authProp.authCode)
         restTemplate = RestTemplateBuilder({
             it.errorHandler = authClientResponseErrorHandler
-            it.interceptors.add(AuthClientInterceptor(authProp.clientSecret))
+            it.interceptors.add(AuthClientInterceptor(authProp.authCode))
         }).build()
     }
 
     override fun addUser(createUserDto: CreateUserDto)  {
-        restTemplate.postForEntity("/auth/admin/realms/SocialApp/users", createUserDto, Void::class.java)
+        restTemplate.postForEntity("${authProp.host}/auth/admin/realms/SocialApp/users", createUserDto, Void::class.java)
     }
 
     override fun fetchUserByUsername(username: String): UserFetched? {
-       return restTemplate.getForEntity<List<UserFetched>>("auth/admin/realms/SocialApp/users?username=$username",
-           typeReference<List<UserFetched>>()).body?.get(0)
+       val x = restTemplate.getForEntity<List<UserFetched>>("${authProp.host}auth/admin/realms/SocialApp/users?username=$username")
 
+        val asMap = ((x.body as ArrayList).toArray()[0] as LinkedHashMap<String, Any>)
+
+        return UserFetched(
+            id = asMap["id"].toString(),
+            createdTimestamp = asMap["createdTimestamp"].toString(),
+            username = asMap["username"].toString(),
+            enabled = asMap["enabled"].toString(),
+            emailVerified = asMap["emailVerified"].toString(),
+            firstName = asMap["firstName"].toString(),
+            lastName = asMap["lastName"].toString(),
+            email = asMap["email"].toString(),
+            notBefore = asMap["notBefore"].toString()
+        )
     }
 
     override fun fetchUserByUserId(id: UUID): UserFetched? {
-        return restTemplate.getForEntity<UserFetched>("auth/admin/realms/SocialApp/users/${id}", UserFetched::class).body
+        return restTemplate.getForEntity<UserFetched>("${authProp.host}auth/admin/realms/SocialApp/users/${id}", UserFetched::class).body
     }
 
     override fun persistUser(createUserDto: CreateUserDto): UserFetched? {
@@ -51,12 +64,12 @@ class AuthServerClientImpl(val authProp: AuthClientProp,
     }
 
     override fun updateUser(user: UserFetched): UserFetched? {
-        restTemplate.put("auth/admin/realms/SocialApp/users/${user.id}", user)
+        restTemplate.put("${authProp.host}auth/admin/realms/SocialApp/users/${user.id}", user)
         return fetchUserByUsername(user.username!!)
     }
 
     override fun deleteUserById(id: UUID) {
-        restTemplate.delete("auth/admin/realms/SocialApp/users")
+        restTemplate.delete("${authProp.host}auth/admin/realms/SocialApp/users")
     }
 }
 

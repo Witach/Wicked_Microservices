@@ -21,7 +21,7 @@ class GroupService(
         groupRepository.findById(group)?.also {
             it.addProfile(profile)
             val targetGroup =  groupRepository.save(it)
-            eventPublisher.publish(ProfileAddedEvent(targetGroup.entityId!!, profile))
+            eventPublisher.publish(ProfileAddedEvent(targetGroup.entityId!!, profile), "profile-added-event")
             profileService.addGroupToProfile(group, profile)
         } ?: throw EntityNotFoundException(Group::class.java, group)
     }
@@ -30,7 +30,7 @@ class GroupService(
         groupRepository.findById(group)?.also {
             it.removeProfile(profile)
             groupRepository.save(it)
-            eventPublisher.publish(RemoveProfileEvent(it.entityId!!, profile))
+            eventPublisher.publish(RemoveProfileEvent(it.entityId!!, profile), "profile-removed-event")
             profileService.removeGroupFromProfile(group, profile)
         } ?: throw EntityNotFoundException(Group::class.java, group)
     }
@@ -43,7 +43,7 @@ class GroupService(
             description = group.description,
             image = group.image
         ))
-        eventPublisher.publish(GroupCreated(createdGroup))
+        eventPublisher.publish(GroupCreated(createdGroup), "group-created-event")
     }
 
     fun removeGroup(group: UUID) {
@@ -51,7 +51,7 @@ class GroupService(
             if(it.isAdministrator(group)) {
                 profileService.removeGroupFromProfiles(group, it.profiles)
                 groupRepository.deleteById(group)
-                eventPublisher.publish(GroupRemovedEvent(group))
+                eventPublisher.publish(GroupRemovedEvent(group), "group-removed-event")
             }
         } ?: throw EntityNotFoundException(Group::class.java, group)
     }

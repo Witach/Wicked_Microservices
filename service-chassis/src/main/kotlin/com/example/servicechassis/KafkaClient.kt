@@ -6,6 +6,8 @@ import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.clients.consumer.OffsetAndTimestamp
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.protocol.types.Field.Str
+import org.example.DomainEvent
+import org.example.EventPublisher
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory
 import org.springframework.kafka.core.KafkaTemplate
 import java.time.Instant
@@ -14,10 +16,14 @@ import java.util.*
 class KafkaClient(val kafka: KafkaTemplate<String, String>,
                   val objectMapper: ObjectMapper,
                   val consumerFactory: DefaultKafkaConsumerFactory<String, String>
-) {
+): EventPublisher {
     
     fun send(topic: String, key: String ,value: Map<String, Any>) {
         kafka.send(topic, key, objectMapper.writeValueAsString(value))
+    }
+
+    override fun publish(domainEvent: DomainEvent<*>, topic: String) {
+        send(topic, domainEvent.eventId.toString(), mapOf("event" to objectMapper.writeValueAsString(domainEvent)))
     }
 
     fun receiveSyncResp(topic: String, key: String): Map<String, String>? {

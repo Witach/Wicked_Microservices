@@ -1,13 +1,14 @@
 package com.example
 
+import org.springframework.format.annotation.DateTimeFormat
 import java.time.LocalDate
 import java.util.*
 
 data class CreateUserProjection(
     val username: String?,
-    val birthday: LocalDate?,
+    @DateTimeFormat(pattern="yyyy-MM-dd") val birthday: LocalDate?,
     var email: String?,
-    var passowrd: String?
+    var password: String?
 )
 
 data class UserEditProjection(
@@ -16,14 +17,14 @@ data class UserEditProjection(
 
 data class ProfileEditProjection(
     var username: String?,
-    var birthday: LocalDate?,
+    @DateTimeFormat(pattern="yyyy-MM-dd") var birthday: LocalDate?,
     var avatar: String?,
 )
 
 data class ProfileProjection(
     val profileID: UUID,
     var username: String?,
-    var birthday: LocalDate?,
+    @DateTimeFormat(pattern="yyyy-MM-dd") var birthday: LocalDate?,
     val userId: UUID,
     var avatar: String,
 )

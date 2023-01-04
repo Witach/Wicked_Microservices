@@ -1,7 +1,6 @@
 package com.example.service
 
 import EmailChangedEvent
-import PasswoordChangedEvent
 import UserCreatedEvent
 import UserDeletedEvent
 import com.example.CreateUserProjection
@@ -23,7 +22,7 @@ class UserService(
     private val authClient: AuthServerClient
 ) {
     fun registerNewUser(createUserProjection: CreateUserProjection) {
-        if(!userRepository.existsByEmail(createUserProjection.email as String)) {
+        if(userRepository.existsByEmail(createUserProjection.email as String)) {
            throw EmailInUseException("Provided email is already in use")
         }
 
@@ -32,18 +31,18 @@ class UserService(
         persistedUser ?: throw RegistrationException("x")
 
         val user = userRepository.save(User(
-            userId = persistedUser.id!!,
+            userId = persistedUser.id?.toUUID()!!,
             email = createUserProjection.email!!
         ))
 
         val profile = profileRepository.save(Profile(
-            profileID = persistedUser.id!!,
+            profileID = persistedUser.id?.toUUID()!!,
             username = createUserProjection.username!!,
             birthday = createUserProjection.birthday,
             userId = user.userId,
         ))
 
-        eventPublisher.publish(UserCreatedEvent(user, profile))
+        eventPublisher.publish(UserCreatedEvent(user, profile), "user-created-event")
     }
 
     fun editUser(user: UUID, userPost: UserEditProjection) {
@@ -54,7 +53,7 @@ class UserService(
         userRepository.findById(user)?.also {
             it.editEmail(userPost.email)
             userRepository.save(it)
-            eventPublisher.publish(EmailChangedEvent(userPost.email))
+            eventPublisher.publish(EmailChangedEvent(userPost.email), "email-changed-event")
         } ?: throw EntityNotFoundException(User::class.java, user)
     }
 
@@ -67,7 +66,15 @@ class UserService(
             throw EntityNotFoundException(User::class.java, user)
         }
         userRepository.deleteById(user)
-        eventPublisher.publish(UserDeletedEvent(user))
+        eventPublisher.publish(UserDeletedEvent(user), "user-deleted-event")
+    }
+
+    fun getUser(user: UUID): User {
+        return userRepository.findById(user) ?: throw EntityNotFoundException(User::class.java, user)
+    }
+
+    fun getAllUsers(): List<User> {
+        return userRepository.findAll()
     }
 
     class EmailInUseException(message: String): RuntimeException(message)
@@ -80,13 +87,13 @@ fun CreateUserProjection.toCreateDTO() = CreateUserDto(
     false,
     this.username!!,
     setOf(CredentialDto(
-        value = this.passowrd!!,
+        value = this.password!!,
         temporary = false
     ))
 )
 
 fun UserEditProjection.toUserFetched(id: UUID) = UserFetched(
-    id = id,
+    id = id.toString(),
     username = this.email,
     email = this.email
 )

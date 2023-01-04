@@ -9,8 +9,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.runApplication
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.context.support.beans
-import org.springframework.core.env.ConfigurableEnvironment
-import org.springframework.core.env.get
 
 @EnableFeignClients
 @SpringBootApplication

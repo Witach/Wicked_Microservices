@@ -1,14 +1,13 @@
 package com.example.servicechassis
 
-import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.example.AuthServerClient
 import org.example.CreateUserDto
 import org.example.UserFetched
 import org.springframework.boot.web.client.RestTemplateBuilder
-import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpRequest
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.http.client.ClientHttpRequestExecution
 import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.http.client.ClientHttpResponse
@@ -16,8 +15,6 @@ import org.springframework.web.client.ResponseErrorHandler
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.client.getForEntity
 import java.util.*
-
-//inline fun <reified T> typeReference() = object : TypeReference<T>() {}
 
 class AuthServerClientImpl(val authProp: AuthClientProp,
                            private val authClientResponseErrorHandler: AuthClientResponseErrorHandler): AuthServerClient {
@@ -39,7 +36,19 @@ class AuthServerClientImpl(val authProp: AuthClientProp,
     override fun fetchUserByUsername(username: String): UserFetched? {
        val x = restTemplate.getForEntity<List<UserFetched>>("${authProp.host}auth/admin/realms/SocialApp/users?username=$username")
 
-        val asMap = ((x.body as ArrayList).toArray()[0] as LinkedHashMap<String, Any>)
+        return extractUser(x)
+    }
+
+    fun fetchUserById(id: UUID): UserFetched? {
+        val x = restTemplate.getForEntity<List<UserFetched>>("${authProp.host}auth/admin/realms/SocialApp/users/$id")
+
+        return extractUser(x)
+    }
+
+    fun fetchUserById(id: String): UserFetched? = fetchUserById(id.toUUID())
+
+    fun extractUser(response: ResponseEntity<*>) : UserFetched {
+        val asMap = ((response.body as ArrayList<*>).toArray()[0] as LinkedHashMap<String, Any>)
 
         return UserFetched(
             id = asMap["id"].toString(),
@@ -71,11 +80,11 @@ class AuthServerClientImpl(val authProp: AuthClientProp,
 
     override fun updateUser(user: UserFetched): UserFetched? {
         restTemplate.put("${authProp.host}auth/admin/realms/SocialApp/users/${user.id}", user)
-        return fetchUserByUsername(user.username!!)
+        return fetchUserById(user.id)
     }
 
     override fun deleteUserById(id: UUID) {
-        restTemplate.delete("${authProp.host}auth/admin/realms/SocialApp/users")
+        restTemplate.delete("${authProp.host}auth/admin/realms/SocialApp/users/$id")
     }
 }
 

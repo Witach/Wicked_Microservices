@@ -62,7 +62,7 @@ class UserService(
 
         authClient.deleteUserById(user)
 
-        if(userRepository.existById(user)) {
+        if(!userRepository.existById(user)) {
             throw EntityNotFoundException(User::class.java, user)
         }
         userRepository.deleteById(user)

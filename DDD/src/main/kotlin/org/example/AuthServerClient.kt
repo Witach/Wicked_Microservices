@@ -37,7 +37,7 @@ data class CredentialDto(
 
 
 data class UserFetched(
-    val id : String? = null,
+    val id : String,
     val createdTimestamp: String? = null,
     val username: String? = null,
     val enabled: String? = null,

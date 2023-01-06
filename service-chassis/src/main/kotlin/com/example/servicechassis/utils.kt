@@ -68,8 +68,15 @@ fun beanDefinitions(dsl: BeanDefinitionDsl) {
     dsl.bean {
         AuthServerClientImpl(ref(), ref())
     }
-    dsl.bean {
-        SessionStorageImpl()
+    dsl.profile("prod") {
+        dsl.bean {
+            SessionStorageImpl()
+        }
+    }
+    dsl.profile("dev") {
+        dsl.bean {
+            SessionStorageMock()
+        }
     }
 
 }

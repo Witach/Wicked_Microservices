@@ -57,3 +57,14 @@ class KafkaClient(val kafka: KafkaTemplate<String, String>,
     }
     
 }
+
+class EventPublisherMock(): EventPublisher {
+    val listMap = mutableListOf<Map<String, Any>>()
+        get
+
+    override fun publish(domainEvent: DomainEvent<*>, topic: String) {
+        listMap.add(mapOf("event" to domainEvent, "topic" to topic))
+    }
+
+
+}

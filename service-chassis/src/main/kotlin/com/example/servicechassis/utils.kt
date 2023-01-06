@@ -26,6 +26,7 @@ import org.springframework.security.config.annotation.web.configurers.Expression
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.web.servlet.function.ServerRequest
 import org.springframework.web.servlet.function.paramOrNull
+import org.springframework.web.servlet.function.router
 import java.util.*
 
 typealias UrlRestrictions = ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry;
@@ -73,7 +74,7 @@ fun beanDefinitions(dsl: BeanDefinitionDsl) {
 
 }
 
-fun kafkaProducers(dsl: BeanDefinitionDsl, topics: List<String>) {
+fun kafkaProducers(dsl: BeanDefinitionDsl, profile: Array<String>, eventPublisherMock: EventPublisherMock? = null) {
     dsl.bean {
         DefaultKafkaProducerFactory<String, String>(mapOf(
                 BOOTSTRAP_SERVERS_CONFIG to dsl.env["kafka.bootstrapServer"],
@@ -81,7 +82,22 @@ fun kafkaProducers(dsl: BeanDefinitionDsl, topics: List<String>) {
                 VALUE_SERIALIZER_CLASS_CONFIG to Serializer<Any>{ topic, data -> ObjectMapper().writeValueAsBytes(data) }
         ))
     }
-    dsl.bean<KafkaClient>()
+
+    if(profile.contains("dev")) {
+        dsl.bean {
+            dsl.bean<EventPublisherMock>()
+        }
+        dsl.bean {
+            router {
+                GET("/events") { req ->
+                    val events = ref<EventPublisherMock>().listMap
+                    ok().body(events)
+                }
+            }
+        }
+    } else {
+        dsl.bean<KafkaClient>()
+    }
 }
 
 fun kafkaConsumer(dsl: BeanDefinitionDsl) {

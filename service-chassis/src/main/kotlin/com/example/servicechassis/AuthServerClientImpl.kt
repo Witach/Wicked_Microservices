@@ -60,7 +60,13 @@ class AuthServerClientImpl(val authProp: AuthClientProp,
 
     override fun persistUser(createUserDto: CreateUserDto): UserFetched? {
         addUser(createUserDto)
-        return fetchUserByUsername(createUserDto.username)
+        val user = fetchUserByUsername(createUserDto.username)
+        enableUser(user?.id!!)
+        return user
+    }
+
+    fun enableUser(id: String) {
+        restTemplate.put("${authProp.host}auth/admin/realms/SocialApp/users/$id", mapOf("enabled" to true, "emailVerified" to true))
     }
 
     override fun updateUser(user: UserFetched): UserFetched? {
@@ -96,6 +102,7 @@ class AuthClientInterceptor(val authCode: String): ClientHttpRequestInterceptor 
                            execution: ClientHttpRequestExecution): ClientHttpResponse {
 
         request.headers.add("Authorization", "Bearer $authCode")
+        request.headers.add("Content-Type", "application/json")
 
         return execution.execute(request, body);
     }

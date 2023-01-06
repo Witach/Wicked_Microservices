@@ -21,7 +21,7 @@ fun main(args: Array<String>) {
             beans {
                 beanDefinitions(this)
                 kafkaConsumer(this)
-                kafkaProducers(this, extractList(env, "kafka.topics"))
+                kafkaProducers(this, env.activeProfiles)
                 bean<ProfileService>()
                 bean<UserService>()
                 profile("dev") {

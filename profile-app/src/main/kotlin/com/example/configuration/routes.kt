@@ -1,5 +1,6 @@
 package com.example.configuration
 
+import com.example.ProfileProjectionWithFollow
 import com.example.service.ProfileService
 import com.example.service.UserService
 import com.example.servicechassis.map
@@ -15,6 +16,12 @@ import java.util.*
 fun routes(profileService: ProfileService, userService: UserService): RouterFunction<ServerResponse>{
     return router {
         path("profile").nest {
+            GET("/{profileId}") {
+                ok().body(profileService.fetchUserProfile(it.map("profileId")))
+            }
+            GET("") {
+                ok().body(profileService.fetchAllProfiles())
+            }
             PUT("{profileId}") {
                 ok().body(
                     profileService.editProfile(

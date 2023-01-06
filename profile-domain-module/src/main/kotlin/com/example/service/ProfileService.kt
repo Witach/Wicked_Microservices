@@ -1,6 +1,7 @@
 package com.example.service
 
 import com.example.ProfileEditProjection
+import com.example.ProfileProjectionWithFollow
 import com.example.applicationservice.SessionStorage
 import com.example.entity.Profile
 import com.example.repository.ProfileRepository
@@ -46,12 +47,12 @@ class ProfileService(
         }
     }
 
-    fun startToFollow(profileId: UUID, profileToFollow: UUID) {
-        if(!profileRepository.existById(profileToFollow)) {
-            throw EntityNotFoundException(Profile::class.java, profileToFollow)
+    fun startToFollow(profileId: UUID, profileToFollow: ProfileProjectionWithFollow) {
+        if(!profileRepository.existById(profileToFollow.profileID)) {
+            throw EntityNotFoundException(Profile::class.java, profileToFollow.profileID)
         }
         profileRepository.findById(profileId)?.also {
-            val event = it.addFollowedProfile(profileToFollow)
+            val event = it.addFollowedProfile(profileToFollow.profileID)
             profileRepository.save(it)
             eventPublisher.publish(event, "profile-started-to-follow")
         } ?: throw EntityNotFoundException(Profile::class.java, profileId)
@@ -67,6 +68,14 @@ class ProfileService(
             profileRepository.save(it)
             eventPublisher.publish(event, "profile-removed-followed-profile")
         } ?: throw EntityNotFoundException(Profile::class.java, profile)
+    }
+
+    fun fetchUserProfile(profileId: UUID): Profile {
+        return profileRepository.findById(profileId) ?: throw EntityNotFoundException(Profile::class.java, profileId)
+    }
+
+    fun fetchAllProfiles(): Set<Profile> {
+        return profileRepository.findAll()
     }
 
     fun throwIfNoSuchGroupd(groupUUID: UUID) {

@@ -2,6 +2,7 @@ package com.example.configuration
 
 import com.example.CreateUserProjection
 import com.example.ProfileEditProjection
+import com.example.ProfileProjectionWithFollow
 import com.example.UserEditProjection
 import com.example.service.ProfileService
 import com.example.service.UserService
@@ -39,7 +40,7 @@ class Listeners(val objectMapper: ObjectMapper,
     fun `profile-starttofollow-message`(content: String) {
         val map = objectMapper.readValue(content, Map::class.java)
         profileService.startToFollow(UUID.fromString(map["profileId"] as String),
-            UUID.fromString(map["profileToFollow"] as String))
+            ProfileProjectionWithFollow(UUID.fromString(map["profileToFollow"] as String)) )
     }
 
     @KafkaListener(topics = ["profile-stoptofollow-message"], groupId = "profile-stoptofollow-message-consumer")

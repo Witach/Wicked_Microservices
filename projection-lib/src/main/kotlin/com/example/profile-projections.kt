@@ -28,3 +28,7 @@ data class ProfileProjection(
     val userId: UUID,
     var avatar: String,
 )
+
+data class ProfileProjectionWithFollow(
+    val profileID: UUID
+)

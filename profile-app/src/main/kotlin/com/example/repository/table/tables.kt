@@ -9,7 +9,7 @@ import java.util.*
 @Document("profiles")
 data class ProfileTable(
     @Id val profileID: UUID,
-    @DocumentReference val user:UserTable,
+    @DocumentReference val user:UserTable?,
     var username: String?,
     var birthday: LocalDate?,
     val groups: MutableSet<UUID> = mutableSetOf(),

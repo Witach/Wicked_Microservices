@@ -12,4 +12,5 @@ interface UserRepository: EntityRepository<User> {
 }
 
 interface ProfileRepository: EntityRepository<Profile> {
+    fun findAll(): Set<Profile>
 }

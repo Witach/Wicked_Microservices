@@ -34,6 +34,12 @@ class ProfileRepositoryImpl(val profileMongoRepository: ProfileMongoRepository):
     override fun existById(uuid: UUID): Boolean {
         return profileMongoRepository.existsById(uuid)
     }
+
+    override fun findAll(): Set<Profile> {
+        return profileMongoRepository.findAll()
+            .map { it.toProfile() }
+            .toSet()
+    }
 }
 
 fun Profile.toProfileTable(): ProfileTable = ProfileTable(
@@ -41,5 +47,5 @@ fun Profile.toProfileTable(): ProfileTable = ProfileTable(
 )
 
 fun ProfileTable.toProfile(): Profile = Profile(
-    profileID, user.email, birthday, user.userId, groups, followed
+    profileID, user!!.email, birthday, user.userId, groups, followed
 )

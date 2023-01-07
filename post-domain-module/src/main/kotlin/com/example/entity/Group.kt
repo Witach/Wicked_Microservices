@@ -7,6 +7,7 @@ import com.example.event.ProfileAddedEvent
 import com.example.event.RemoveProfileEvent
 import org.example.DDDEntity
 import java.util.UUID
+import java.util.function.Predicate
 
 class Group(
     val groupInt: UUID,
@@ -21,17 +22,17 @@ class Group(
     override val entityId: UUID?
         get() = groupInt
 
-    public fun addProfile(profile: UUID): ProfileAddedEvent {
+     fun addProfile(profile: UUID): ProfileAddedEvent {
         profiles.add(profile)
         return ProfileAddedEvent(groupInt, profile)
     }
 
-    public fun removeProfile(profile: UUID): RemoveProfileEvent {
+     fun removeProfile(profile: UUID): RemoveProfileEvent {
         profiles.remove(profile);
         return RemoveProfileEvent(groupInt, profile)
     }
 
-    public fun addAdministrator(admin: UUID): AdministratorAddedEvent {
+     fun addAdministrator(admin: UUID): AdministratorAddedEvent {
         if(!containsProfile(admin)) {
             throw ProfileNotIncludedException("Member of id=$admin is not part of the group")
         }
@@ -48,7 +49,7 @@ class Group(
         return administrators.contains(user) || owner == user
     }
 
-    public fun containsProfile(profile: UUID): Boolean {
+     fun containsProfile(profile: UUID): Boolean {
         return profiles.contains(profile) || owner == profile
     }
 

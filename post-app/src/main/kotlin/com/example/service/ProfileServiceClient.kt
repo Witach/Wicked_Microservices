@@ -51,3 +51,16 @@ class ProfileServiceClientKafka(val kafkaTemplate: KafkaTemplate<String, String>
         }
     }
 }
+
+@Profile("dumb")
+@Component
+class ProfileServiceDumb(val profileServiceFeignClient: ProfileServiceFeignClient): ProfileService {
+    override fun addGroupToProfile(group: UUID, profile: UUID) {
+    }
+
+    override fun removeGroupFromProfile(group: UUID, profile: UUID) {
+    }
+
+    override fun removeGroupFromProfiles(group: UUID, profile: Set<UUID>) {
+    }
+}

@@ -4,6 +4,7 @@ import abstractcom.example.applicationservice.CommentService
 import com.example.applicationservice.GroupPostService
 import com.example.applicationservice.GroupService
 import com.example.applicationservice.PostService
+import com.example.applicationservice.SessionStorage
 import com.example.configuration.routes
 import com.example.service.Listeners
 import com.example.servicechassis.*
@@ -17,6 +18,7 @@ import org.springframework.core.env.get
 import org.springframework.kafka.annotation.EnableKafka
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
+import java.util.function.Predicate
 
 @EnableKafka
 @EnableFeignClients
@@ -26,28 +28,45 @@ class PostApp
 
 fun main(args: Array<String>) {
     runApplication<PostApp>(*args) {
-        beans {
-            bean<CommentService>()
-            bean<GroupPostService>()
-            bean<GroupService>()
-            bean<PostService>()
-            bean<Listeners>()
-            bean {
-                routes(ref(), ref(), ref(), ref())
-            }
-            kafkaConsumer(this)
-            kafkaProducers(this, extractList(env, "kafka.topics"))
-            beanDefinitions(this)
-            profile("dev") {
+        addInitializers(
+            beans {
+                kafkaProducers(this, env.activeProfiles)
+                bean<CommentService>()
+                bean<PostService>()
                 bean {
-                    filterChain(ref(), ::devRestrictions)
+                    routes(ref(), ref(), ref(), ref())
+                }
+                kafkaConsumer(this)
+                beanDefinitions(this)
+                profile("dev") {
+                    bean {
+                        filterChain(ref(), ::devRestrictions)
+                    }
+                    bean {
+                        GroupService(ref(), ref(), ref()) { true }
+                    }
+                    bean {
+                        GroupPostService(ref(), ref(), ref(), ref()) { true }
+                    }
+                }
+                profile("prod") {
+                    bean<KafkaClient>()
+                    bean<Listeners>()
+                    bean {
+                        filterChain(ref(), ::prodRestriction)
+                    }
+                    bean {
+                        GroupService(ref(), ref(), ref()) {
+                            it.isAdministrator(ref<SessionStorage>().sessionOwner.userId!!)
+                        }
+                    }
+                    bean {
+                        GroupPostService(ref(), ref(), ref(), ref()) {
+                            it.profiles.contains(ref<SessionStorage>().sessionOwner.userId!!)
+                        }
+                    }
                 }
             }
-            profile("prod") {
-                bean {
-                    filterChain(ref(), ::prodRestriction)
-                }
-            }
-        }
+        )
     }
 }

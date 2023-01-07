@@ -14,7 +14,7 @@ import org.springframework.web.servlet.function.RouterFunctions.route
 fun routes(commentService: CommentService, groupPostService: GroupPostService,
            groupService: GroupService, postService: PostService): RouterFunction<ServerResponse> {
     return router {
-        "/comment".nest {
+        path("/comment").nest {
             POST("") {
                 ServerResponse.ok().body(commentService.addComment(it.body()))
             }
@@ -46,7 +46,7 @@ fun routes(commentService: CommentService, groupPostService: GroupPostService,
                 )
             }
         }
-        "/group/post".nest {
+        path("/group/post").nest {
             POST("") {
                 ServerResponse.ok().body(
                     groupPostService.addGroupPost(
@@ -68,6 +68,13 @@ fun routes(commentService: CommentService, groupPostService: GroupPostService,
                     )
                 )
             }
+            GET("") {
+                ServerResponse.ok().body(
+                    groupPostService.getGroupPosts(
+                        it.body()
+                    )
+                )
+            }
             PUT("/{postId}/{text}") {
                 ServerResponse.ok().body(
                     groupPostService.editPostText(
@@ -77,7 +84,7 @@ fun routes(commentService: CommentService, groupPostService: GroupPostService,
                 )
             }
         }
-        "/group".nest {
+        path("/group").nest {
             POST("") {
                 ServerResponse.ok().body(groupService.addGroup(it.body()))
             }
@@ -94,43 +101,45 @@ fun routes(commentService: CommentService, groupPostService: GroupPostService,
             }
             DELETE("/{groupId}/profile/{profileId}") {
                 ServerResponse.ok().body(groupService.removeProfile(
-                    it.map("groupId"),
+                    it.map("profileId"),
                     it.map("groupId")
                 ))
             }
             GET("/{groupId}/exists") {
-                ServerResponse.ok().body(groupService.existsById(
-                    it.map("groupId")
+                ServerResponse.ok().body(mapOf(
+                    "exists" to groupService.existsById(it.map("groupId"))
                 ))
             }
         }
-        "/post".nest {
-            route(RequestPredicates.GET("")) {
-                val profileId = it.paramOrNull("profileId")?.toUUID()
-                    ?: throw RequiredParamsNotIncludedException(listOf("profileId"))
+        path("/post").nest {
+            GET("") {
                 ServerResponse.ok().body(
                     postService.loadPostsPage(
-                        profileId,
-                        it.paraMap("page") ?: 1,
+                        it.body(),
+                        it.paraMap("page") ?: 0,
                         it.paraMap("size") ?: 20
                     )
                 )
-            }.andRoute(RequestPredicates.POST("")) {
+            }
+            POST("") {
                 ServerResponse.ok().body(
                     postService.addPost(it.body())
                 )
-            }.andRoute(RequestPredicates.DELETE("/{postId}")) {
+            }
+            DELETE("/{postId}") {
                 ServerResponse.ok().body(
                     postService.deletePost(it.map("postId"))
                 )
-            }.andRoute(RequestPredicates.PUT("/{postId}")) {
+            }
+            PUT("/{postId}") {
                 ServerResponse.ok().body(
                     postService.editPostText(
                         it.map("postId"),
                         it.body()
                     )
                 )
-            }.andRoute(RequestPredicates.DELETE("/{postId}/attachment/{attachmentId}")) {
+            }
+            DELETE("/{postId}/attachment/{attachmentId}") {
                 ServerResponse.ok().body(
                     postService.deletePostAttachment(
                         it.map("postId"),

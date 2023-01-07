@@ -1,6 +1,7 @@
 package com.example.applicationservice
 
 import com.example.GroupCreateProjection
+import com.example.ProfileProjectionWithFollow
 import com.example.entity.Group
 import com.example.event.GroupCreated
 import com.example.event.GroupRemovedEvent
@@ -10,19 +11,21 @@ import com.example.repository.*
 import org.example.EntityNotFoundException
 import org.example.EventPublisher
 import java.util.*
+import java.util.function.Predicate
 
 class GroupService(
     private val groupRepository: GroupRepository,
     private val profileService: ProfileService,
-    private val eventPublisher: EventPublisher
+    private val eventPublisher: EventPublisher,
+    private val administratorPolicy: Predicate<Group>
 ) {
 
-    fun addProfile(profile: UUID, group: UUID) {
+    fun addProfile(profile: ProfileProjectionWithFollow, group: UUID) {
         groupRepository.findById(group)?.also {
-            it.addProfile(profile)
+            it.addProfile(profile.profileID)
             val targetGroup =  groupRepository.save(it)
-            eventPublisher.publish(ProfileAddedEvent(targetGroup.entityId!!, profile), "profile-added-event")
-            profileService.addGroupToProfile(group, profile)
+            eventPublisher.publish(ProfileAddedEvent(targetGroup.entityId!!, profile.profileID), "profile-added-event")
+            profileService.addGroupToProfile(group, profile.profileID)
         } ?: throw EntityNotFoundException(Group::class.java, group)
     }
 
@@ -37,18 +40,19 @@ class GroupService(
 
     fun addGroup(group: GroupCreateProjection) {
         val createdGroup = groupRepository.save(Group(
-            groupInt = group.groupInt,
-            name = group.name,
-            owner = group.owner,
-            description = group.description,
-            image = group.image
+            groupInt = UUID.randomUUID(),
+            name = group.name ?: "",
+            owner = group.owner!!,
+            description = group.description ?: "",
+            image = group.image ?: "",
+            administrators = mutableSetOf(group.owner!!)
         ))
         eventPublisher.publish(GroupCreated(createdGroup), "group-created-event")
     }
 
     fun removeGroup(group: UUID) {
         groupRepository.findById(group)?.also {
-            if(it.isAdministrator(group)) {
+            if(administratorPolicy.test(it)) {
                 profileService.removeGroupFromProfiles(group, it.profiles)
                 groupRepository.deleteById(group)
                 eventPublisher.publish(GroupRemovedEvent(group), "group-removed-event")

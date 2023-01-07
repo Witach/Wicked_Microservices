@@ -13,7 +13,7 @@ import org.example.EventPublisher
 import java.time.LocalDateTime
 import java.util.*
 
-public class CommentService(
+class CommentService(
     private val commentRepository: CommentRepository,
     private val eventPublisher: EventPublisher,
 ) {

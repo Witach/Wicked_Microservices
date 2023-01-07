@@ -8,8 +8,13 @@ import java.util.*
 
 @Component
 class AllPostsRepositoryImpl(val allPostsJpaRepository: AllPostsJpaRepository): AllPostsRepository {
-    override fun findAll(profile: UUID, page: Int, size: Int): List<Post> {
-        return allPostsJpaRepository.findAllByPostId(profile,
+
+    override fun findAll(): List<Post> {
+        return allPostsJpaRepository.findAll().toList().map { it.toPost() }
+    }
+
+    override fun findAllByAuthorIn(profiles: Set<UUID>, page: Int, size: Int): List<Post> {
+        return allPostsJpaRepository.findAllByAuthorIn(profiles,
             PageRequest.of(page, size, Sort.by("sentTime")))
             .map { it.toPost() }
     }

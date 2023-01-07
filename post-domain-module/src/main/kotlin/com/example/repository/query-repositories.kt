@@ -19,5 +19,7 @@ interface GroupRepository: EntityRepository<Group>
 interface PostRepository: EntityRepository<Post>
 
 interface AllPostsRepository {
-    fun findAll(profile: UUID, page: Int, size: Int): List<Post>
+    fun findAll(): List<Post>
+
+    fun findAllByAuthorIn(profiles: Set<UUID>, page: Int, size: Int): List<Post>
 }

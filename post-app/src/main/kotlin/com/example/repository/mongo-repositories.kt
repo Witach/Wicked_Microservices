@@ -6,7 +6,9 @@ import java.util.*
 
 interface CommentJpaRepository: MongoRepository<CommentTable, UUID>
 
-interface GroupJpaRepository: MongoRepository<GroupTable, UUID>
+interface GroupJpaRepository: MongoRepository<GroupTable, UUID> {
+    fun findAllByGroupIntInAndProfileIdInProfiles(list: List<UUID>, profileId: UUID, pageable: Pageable): List<GroupTable>
+}
 
 interface GroupPostJpaRepository: MongoRepository<GroupPostTable, UUID> {
     fun findAllByGroupId(id: UUID): List<GroupPostTable>
@@ -16,5 +18,5 @@ interface PostJpaRepository: MongoRepository<PostTable, UUID>
 
 interface AllPostsJpaRepository: MongoRepository<PostTable, String>{
 
-    fun  findAllByPostId(profile: UUID, page: Pageable): List<PostTable>
+    fun  findAllByAuthorIn(profiles: Set<UUID>, page: Pageable): List<PostTable>
 }

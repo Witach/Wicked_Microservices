@@ -15,8 +15,7 @@ import java.util.*
 
 class KafkaClient(val kafka: KafkaTemplate<String, String>,
                   val objectMapper: ObjectMapper,
-                  val consumerFactory: DefaultKafkaConsumerFactory<String, String>
-): EventPublisher {
+                  val consumerFactory: DefaultKafkaConsumerFactory<String, String>): EventPublisher {
     
     fun send(topic: String, key: String ,value: Map<String, Any>) {
         kafka.send(topic, key, objectMapper.writeValueAsString(value))
@@ -48,7 +47,7 @@ class KafkaClient(val kafka: KafkaTemplate<String, String>,
         var rest: Map<String, String>? = null
 
         records.forEach {
-            if (it.key() == key.toString()) {
+            if (it.key() == key) {
                 rest = objectMapper.readValue(it.value(), Map::class.java) as Map<String, String>
             }
         }
@@ -58,7 +57,7 @@ class KafkaClient(val kafka: KafkaTemplate<String, String>,
     
 }
 
-class EventPublisherMock(): EventPublisher {
+class EventPublisherMock: EventPublisher {
     val listMap = mutableListOf<Map<String, Any>>()
         get
 

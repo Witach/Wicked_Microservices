@@ -8,6 +8,7 @@ import com.example.applicationservice.PostService
 import com.example.servicechassis.KafkaClient
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.apache.kafka.clients.consumer.ConsumerRecord
+import org.springframework.context.annotation.Profile
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Service
 import java.util.*
@@ -87,7 +88,8 @@ class Listeners(val objectMapper: ObjectMapper,
     @KafkaListener(topics = ["addprofile-group-message"], groupId = "addprofile-group-message-consumer")
     fun `addprofile-group-message`(record: ConsumerRecord<String, String>) {
         val map = objectMapper.readValue(record.value(), Map::class.java)
-        groupService.addProfile(UUID.fromString(map["groupId"] as String), UUID.fromString(map["profileId"] as String))
+        groupService.addProfile(ProfileProjectionWithFollow(UUID.fromString(map["groupId"] as String)),
+            UUID.fromString(map["profileId"] as String))
     }
 
     @KafkaListener(topics = ["removeprofile-group-message"], groupId = "removeprofile-group-message-consumer")
@@ -118,7 +120,7 @@ class Listeners(val objectMapper: ObjectMapper,
     @KafkaListener(topics = ["update-post-message"], groupId = "update-post-message-consumer")
     fun `update-post-message`(record: ConsumerRecord<String, String>) {
         val map = objectMapper.readValue(record.value(), Map::class.java)
-        postService.editPostText(UUID.fromString(map["postId"] as String), map["postText"] as String)
+        postService.editPostText(UUID.fromString(map["postId"] as String), UpdatePostProjection(map["postText"] as String))
     }
 
     @KafkaListener(topics = ["deleteattachment-post-message"], groupId = "deleteattachment-post-message-consumer")

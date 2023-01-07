@@ -1,8 +1,10 @@
 package com.example.applicationservice
 
+import com.example.GroupIds
 import com.example.GroupPostCreateProjection
 import com.example.PostProjection
 import com.example.entity.Attachment
+import com.example.entity.Group
 import com.example.entity.GroupPost
 import com.example.event.GroupPostAddedEvent
 import com.example.event.GroupPostEditedEvent
@@ -14,25 +16,27 @@ import org.example.NoAuthenticationAvailableException
 import java.lang.IllegalArgumentException
 import java.time.LocalDateTime
 import java.util.*
+import java.util.function.Predicate
 
-public class GroupPostService(
+class GroupPostService(
     private val groupPostRepository: GroupPostRepository,
     private val commentRepository: CommentRepository,
     private val groupRepository: GroupRepository,
-    private val sessionStorage: SessionStorage,
-    private val eventPublisher: EventPublisher
+    private val eventPublisher: EventPublisher,
+    private val permissionPolicy: Predicate<Group>
 ) {
 
     fun addGroupPost(post: GroupPostCreateProjection) {
         val groupPost = groupPostRepository.save(
             GroupPost(
+                postId = UUID.randomUUID(),
                 groupId = post.group,
                 author = post.author,
                 text = post.text,
                 attachments = post.attachments!!.map { Attachment(
-                    it.attachmentId ?: throw IllegalArgumentException("Attachment Id not provided"),
-                    it.resourceLink ?: "",
-                    Attachment.AttachmentType.valueOf(it.type as String)
+                    attachmentId = UUID.randomUUID(),
+                    resourceLink = it.resourceLink ?: "",
+                    type = Attachment.AttachmentType.valueOf(it.type as String)
                 ) }.toMutableList(),
                 sentTime = LocalDateTime.now(),
             )
@@ -40,7 +44,7 @@ public class GroupPostService(
         eventPublisher.publish(GroupPostAddedEvent(groupPost), "group-post-added-event")
     }
 
-    public fun removeGroupPost(postId: UUID) {
+    fun removeGroupPost(postId: UUID) {
         groupPostRepository.findById(postId)?.also {
             it.postId?.let(groupPostRepository::deleteById)
             it.comments.let(commentRepository::removeAll)
@@ -48,7 +52,7 @@ public class GroupPostService(
         } ?: throw EntityNotFoundException(GroupPost::class.java, postId)
     }
 
-    public fun editPostText(postUUID: UUID, text: String) {
+    fun editPostText(postUUID: UUID, text: String) {
         groupPostRepository.findById(postUUID)?.let {
             it.editText(text)
             val groupPost = groupPostRepository.save(it)
@@ -56,15 +60,24 @@ public class GroupPostService(
         } ?: throw EntityNotFoundException(GroupPost::class.java, postUUID)
     }
 
-    public fun getGroupPosts(groupId: UUID): List<PostProjection> {
-        return groupRepository.findById(groupId).let {group ->
-            sessionStorage.sessionOwner.userId?.let { userId ->
-                if(group?.containsProfile(userId) == true) {
-                    groupPostRepository.findByGroupId(groupId).map { it.toPostProjection() }
-                } else emptyList()
-            }  ?: throw NoAuthenticationAvailableException()
+    fun getGroupPosts(groupId: UUID): List<PostProjection> {
+        return groupRepository.findById(groupId)?.let {group ->
+            if(permissionPolicy.test(group)) {
+                groupPostRepository.findByGroupId(groupId).map { it.toPostProjection() }
+            } else emptyList()
+        } ?: throw NoAuthenticationAvailableException()
+    }
 
-        }
+    fun getGroupPosts(groupIds: GroupIds): List<PostProjection> {
+
+        return groupRepository.findAllByIds(groupIds.groupIds)?.let {groups ->
+            groups.map { group ->
+                if(permissionPolicy.test(group)) {
+                    groupPostRepository.findByGroupId(groupId).map { it.toPostProjection() }
+                } else null
+            }
+
+        } ?: throw NoAuthenticationAvailableException()
     }
 
 }

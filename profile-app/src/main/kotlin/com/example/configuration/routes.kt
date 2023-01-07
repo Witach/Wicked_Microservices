@@ -31,10 +31,15 @@ fun routes(profileService: ProfileService, userService: UserService): RouterFunc
                 )
             }
             POST("{profileId}/group") {
+                val groupId = it.param("groupId")
+                    .map { it.toUUID() }
+                    .orElseThrow {
+                        RequiredParamsNotIncludedException(listOf("groupId"))
+                    }
                 ok().body(
                     profileService.addToGroup(
                         it.map("profileId"),
-                        it.body()
+                        groupId
                     )
                 )
             }

@@ -31,3 +31,11 @@ class GroupServiceClientImplKafka(val kafkaClient: KafkaClient): GroupServiceCli
         return kafkaClient.receiveSyncResp("group-exists-response", key)!!["groupExists"]!!.toBoolean()
     }
 }
+
+@Component
+@Profile("dumb")
+class GroupClientDumbImpl(): GroupServiceClient {
+    override fun existsById(group: UUID): Boolean {
+        return true
+    }
+}

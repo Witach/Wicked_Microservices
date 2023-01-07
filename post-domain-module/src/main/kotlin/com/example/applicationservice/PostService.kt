@@ -43,7 +43,7 @@ public class PostService(
                 type = Attachment.AttachmentType.valueOf(it.type.toString())
             ) }?.toMutableList() ?: mutableListOf()
         ))
-        eventPublisher.publish(PostAddedEvent(createdPost))
+        eventPublisher.publish(PostAddedEvent(createdPost),  )
     }
 
     fun deletePost(postUUID: UUID) {

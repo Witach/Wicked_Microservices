@@ -24,7 +24,7 @@ public class PostService(
 ) {
     fun loadPost(postUUID: UUID): PostProjection {
         return repository.findById(postUUID)?.let {
-            val comments = commentRepository.findAllByIds(it.comments)
+            val comments = commentRepository.findAllByIds(it.comments.map { it.commentId!! })
             return it.toPostProjection().also {postProjection ->
                 postProjection.comments = comments.map { comment -> comment.toCommentProjection() }
             }

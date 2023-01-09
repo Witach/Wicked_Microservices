@@ -46,7 +46,7 @@ fun main(args: Array<String>) {
                         GroupService(ref(), ref(), ref()) { true }
                     }
                     bean {
-                        GroupPostService(ref(), ref(), ref(), ref()) { true }
+                        GroupPostService(ref(), ref(), ref(), ref(), ref()) { true }
                     }
                 }
                 profile("prod") {
@@ -61,7 +61,7 @@ fun main(args: Array<String>) {
                         }
                     }
                     bean {
-                        GroupPostService(ref(), ref(), ref(), ref()) {
+                        GroupPostService(ref(), ref(), ref(), ref(), ref()) {
                             it.profiles.contains(ref<SessionStorage>().sessionOwner.userId!!)
                         }
                     }

@@ -36,6 +36,10 @@ class CommentRepositoryImpl(private val commentRepository: CommentJpaRepository)
     override fun existById(uuid: UUID): Boolean {
         return commentRepository.existsById(uuid)
     }
+
+    override fun removeAllByPostId(postId: UUID) {
+        commentRepository.removeAllByPostId(postId)
+    }
 }
 
 fun Comment.toCommentTable(): CommentTable {

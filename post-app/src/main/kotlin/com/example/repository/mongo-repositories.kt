@@ -4,11 +4,11 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.mongodb.repository.MongoRepository
 import java.util.*
 
-interface CommentJpaRepository: MongoRepository<CommentTable, UUID>
-
-interface GroupJpaRepository: MongoRepository<GroupTable, UUID> {
-    fun findAllByGroupIntInAndProfileIdInProfiles(list: List<UUID>, profileId: UUID, pageable: Pageable): List<GroupTable>
+interface CommentJpaRepository: MongoRepository<CommentTable, UUID> {
+    fun removeAllByPostId(postId: UUID): List<CommentTable>
 }
+
+interface GroupJpaRepository: MongoRepository<GroupTable, UUID>
 
 interface GroupPostJpaRepository: MongoRepository<GroupPostTable, UUID> {
     fun findAllByGroupId(id: UUID): List<GroupPostTable>

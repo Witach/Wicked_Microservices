@@ -10,6 +10,6 @@ class GroupPost(
         text: String? = null,
         attachments: MutableList<Attachment> = mutableListOf(),
         sentTime: LocalDateTime? = null,
-        _comments: MutableList<UUID> = mutableListOf()
+        _comments: MutableList<Comment> = mutableListOf()
 ) : Post(postId, author, text, attachments, sentTime, _comments) {
 }

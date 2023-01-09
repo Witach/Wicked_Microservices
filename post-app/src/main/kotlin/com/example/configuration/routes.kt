@@ -1,6 +1,7 @@
 package com.example.configuration
 
 import abstractcom.example.applicationservice.CommentService
+import com.example.GroupIds
 import com.example.applicationservice.GroupPostService
 import com.example.applicationservice.GroupService
 import com.example.applicationservice.PostService
@@ -10,6 +11,7 @@ import org.example.RequiredParamsNotIncludedException
 import org.example.toUUID
 import org.springframework.web.servlet.function.*
 import org.springframework.web.servlet.function.RouterFunctions.route
+import java.util.*
 
 fun routes(commentService: CommentService, groupPostService: GroupPostService,
            groupService: GroupService, postService: PostService): RouterFunction<ServerResponse> {
@@ -68,10 +70,17 @@ fun routes(commentService: CommentService, groupPostService: GroupPostService,
                     )
                 )
             }
+            GET("/posts/{groupId}") {
+                ServerResponse.ok().body(
+                    groupPostService.getGroupPosts(
+                        UUID.fromString(it.pathVariable("groupId")),
+                    )
+                )
+            }
             GET("") {
                 ServerResponse.ok().body(
                     groupPostService.getGroupPosts(
-                        it.body()
+                        it.body<GroupIds>()
                     )
                 )
             }

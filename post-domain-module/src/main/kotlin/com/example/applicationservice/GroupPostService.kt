@@ -23,6 +23,7 @@ class GroupPostService(
     private val commentRepository: CommentRepository,
     private val groupRepository: GroupRepository,
     private val eventPublisher: EventPublisher,
+    private val sessionStorage: SessionStorage,
     private val permissionPolicy: Predicate<Group>
 ) {
 
@@ -47,7 +48,7 @@ class GroupPostService(
     fun removeGroupPost(postId: UUID) {
         groupPostRepository.findById(postId)?.also {
             it.postId?.let(groupPostRepository::deleteById)
-            it.comments.let(commentRepository::removeAll)
+            commentRepository.removeAllByPostId(postId)
             eventPublisher.publish(GroupPostRemovedEvent(it), "group-post-removed-event")
         } ?: throw EntityNotFoundException(GroupPost::class.java, postId)
     }
@@ -69,15 +70,9 @@ class GroupPostService(
     }
 
     fun getGroupPosts(groupIds: GroupIds): List<PostProjection> {
-
-        return groupRepository.findAllByIds(groupIds.groupIds)?.let {groups ->
-            groups.map { group ->
-                if(permissionPolicy.test(group)) {
-                    groupPostRepository.findByGroupId(groupId).map { it.toPostProjection() }
-                } else null
-            }
-
-        } ?: throw NoAuthenticationAvailableException()
+        return groupPostRepository.findAllByGroupIdAndCheckPermission(
+            sessionStorage.sessionOwner.userId!!, groupIds.groupIds)
+            .map { it.toPostProjection() }
     }
 
 }

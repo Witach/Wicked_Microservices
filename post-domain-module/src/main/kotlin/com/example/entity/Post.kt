@@ -14,12 +14,12 @@ open class Post(
         var text: String? = null,
         val attachments: MutableList<Attachment> = mutableListOf(),
         val sentTime: LocalDateTime? = null,
-        private val _comments: MutableList<UUID> = mutableListOf()
+        private val _comments: MutableList<Comment> = mutableListOf()
 ): DDDEntity() {
     override val entityId: UUID?
         get() = postId
 
-    val comments: List<UUID> get() = _comments.toList();
+    val comments: List<Comment> get() = _comments.toList();
 
     fun addAttachment(attachment: Attachment): AttachmentAddedEvent {
         attachments.add(attachment)
@@ -40,6 +40,8 @@ open class Post(
         postId = postId,
         author = author,
         text = text,
+        sentTime = sentTime,
+        comments = comments.map { it.toCommentProjection() },
         attachments = attachments.map { it.toAttachmentProjection() }
     )
 }

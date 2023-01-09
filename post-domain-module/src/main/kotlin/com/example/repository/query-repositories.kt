@@ -8,13 +8,17 @@ import org.example.EntityRepository
 import java.util.*
 import kotlin.collections.Set
 
-interface CommentRepository: EntityRepository<Comment>
+interface CommentRepository: EntityRepository<Comment> {
+    fun removeAllByPostId(postId: UUID)
+}
 
 interface GroupPostRepository: EntityRepository<GroupPost> {
     fun findByGroupId(groupId: UUID): Set<GroupPost>
+
+    fun findAllByGroupIdAndCheckPermission(profile: UUID, groupIds: List<UUID>): List<GroupPost>
 }
 
-interface GroupRepository: EntityRepository<Group>
+interface GroupRepository: EntityRepository<Group> {}
 
 interface PostRepository: EntityRepository<Post>
 

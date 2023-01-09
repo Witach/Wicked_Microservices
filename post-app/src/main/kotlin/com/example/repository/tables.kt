@@ -1,6 +1,7 @@
 package com.example.repository
 
 import com.example.entity.Attachment
+import com.example.entity.GroupPost
 import com.example.entity.Reply
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
@@ -30,21 +31,42 @@ class GroupTable(@Id val groupInt: UUID,
             val administrators: Set<UUID> = setOf())
 
 @Document("groupPosts")
-class GroupPostTable(val groupId: UUID,
+open class GroupPostTable(val groupId: UUID,
+                     @Id val postId: UUID? = null,
+                     val author: UUID? = null,
+                     val text: String? = null,
+                     val attachments: List<AttachmentTable> = listOf(),
+                     val sentTime: LocalDateTime? = null)
+
+data class GroupPostTableWithComments( val groupId: UUID,
                      @Id val postId: UUID? = null,
                      val author: UUID? = null,
                      val text: String? = null,
                      val attachments: List<AttachmentTable> = listOf(),
                      val sentTime: LocalDateTime? = null,
-                     val comments: List<UUID> = listOf())
+                     val comments: List<CommentTable> = listOf())
+
+fun GroupPostTableWithComments.toGroupPost(): GroupPost {
+    return GroupPost(groupId, postId, author, text, attachments.map { it.toAttachment() }
+        .toMutableList(), sentTime, comments.map { it.toComment() }.toMutableList())
+}
+
+class PostTableWithComments(
+    postId: UUID? = null,
+    author: UUID? = null,
+    text: String? = null,
+    attachments: List<AttachmentTable> = listOf(),
+    sentTime: LocalDateTime? = null,
+    val comments: List<CommentTable> = listOf()
+): PostTable(postId, author, text, attachments, sentTime)
+
 
 @Document("posts")
-class PostTable(@Id val postId: UUID? = null,
-                val author: UUID? = null,
-                var text: String? = null,
-                val attachments: List<AttachmentTable> = listOf(),
-                val sentTime: LocalDateTime? = null,
-                val comments: List<UUID> = listOf())
+open class PostTable(@Id val postId: UUID? = null,
+                     val author: UUID? = null,
+                     var text: String? = null,
+                     val attachments: List<AttachmentTable> = listOf(),
+                     val sentTime: LocalDateTime? = null)
 
 class AttachmentTable(@Id val attachmentId: UUID,
                       val resourceLink: String,

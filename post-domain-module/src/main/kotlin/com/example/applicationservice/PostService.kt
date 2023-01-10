@@ -1,9 +1,6 @@
 package com.example.applicationservice
 
-import com.example.PostCreatePorjection
-import com.example.PostProjection
-import com.example.ProfileToSearchForProjection
-import com.example.UpdatePostProjection
+import com.example.*
 import com.example.entity.Attachment
 import com.example.entity.Post
 import com.example.event.PostAddedEvent
@@ -20,7 +17,7 @@ public class PostService(
     private val repository: PostRepository,
     private val commentRepository: CommentRepository,
     private val allPostsRepository: AllPostsRepository,
-    private val eventPublisher: EventPublisher,
+    private val eventPublisher: EventPublisher
 ) {
     fun loadPost(postUUID: UUID): PostProjection {
         return repository.findById(postUUID)?.let {
@@ -74,7 +71,9 @@ public class PostService(
         } ?: throw EntityNotFoundException(Post::class.java, postUUID)
     }
 
-    fun loadAllPosts(): List<PostProjection> {
-        return allPostsRepository.findAll().map { it.toPostProjection() }
+    fun loadAllPosts(feedSearch: FeedSearch, page: Int = 0, size: Int = 20): List<PostProjection> {
+       return  allPostsRepository.feed(feedSearch.profiles, feedSearch.groups.toList(), page, size)
+            .map { it.toPostProjection() }
     }
+
 }

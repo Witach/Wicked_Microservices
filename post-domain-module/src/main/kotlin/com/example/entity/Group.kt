@@ -1,6 +1,7 @@
 package com.example.entity
 
 import com.example.GroupProjection
+import com.example.PostProjection
 import com.example.event.AdministratorAddedEvent
 import com.example.event.AdministratorRemovedEvent
 import com.example.event.ProfileAddedEvent
@@ -53,12 +54,14 @@ class Group(
         return profiles.contains(profile) || owner == profile
     }
 
-    fun toProjection() = GroupProjection(
+    fun toProjection(posts: List<PostProjection> = listOf()) = GroupProjection(
         groupInt = groupInt,
         name = name,
         description = description,
         image = image,
         owner = owner,
         profiles = profiles.toList(),
+        administrators = administrators.toList(),
+        posts = posts
     )
 }

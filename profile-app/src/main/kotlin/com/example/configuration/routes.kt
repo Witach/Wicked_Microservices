@@ -1,17 +1,14 @@
 package com.example.configuration
 
-import com.example.ProfileProjectionWithFollow
 import com.example.service.ProfileService
 import com.example.service.UserService
 import com.example.servicechassis.map
 import org.example.RequiredParamsNotIncludedException
 import org.example.toUUID
-import org.springframework.web.servlet.function.*
-import org.springframework.web.servlet.function.RequestPredicates.*
-import org.springframework.web.servlet.function.RouterFunctions.nest
-import org.springframework.web.servlet.function.RouterFunctions.route
-import org.springframework.web.servlet.function.ServerResponse.*
-import java.util.*
+import org.springframework.web.servlet.function.RouterFunction
+import org.springframework.web.servlet.function.ServerResponse
+import org.springframework.web.servlet.function.body
+import org.springframework.web.servlet.function.router
 
 fun routes(profileService: ProfileService, userService: UserService): RouterFunction<ServerResponse>{
     return router {

@@ -14,7 +14,9 @@ data class GroupProjection(
     val description: String,
     val image: String,
     val owner: UUID,
-    private val profiles: List<UUID> = mutableListOf(),
+    val profiles: List<UUID> = mutableListOf(),
+    val posts: List<PostProjection>? = null,
+    val administrators: List<UUID> = mutableListOf()
 )
 
 data class GroupPostCreateProjection(
@@ -58,6 +60,21 @@ data class UpdatePostProjection(
 
 data class GroupIds(
     val groupIds: List<UUID> = mutableListOf()
+)
+
+data class FeedSearch(
+    val profiles: Set<UUID> = mutableSetOf(),
+    val groups: Set<UUID> = mutableSetOf(),
+)
+
+data class FeedPostProjection (
+    val postId: UUID,
+    val author: UUID,
+    val text: String,
+    val attachments: List<AttachmentProjection>,
+    val sentTime: LocalDateTime,
+    val comments: List<CommentProjection>,
+    val group: UUID?,
 )
 
 

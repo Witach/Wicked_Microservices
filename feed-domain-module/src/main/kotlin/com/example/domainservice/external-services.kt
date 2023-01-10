@@ -8,7 +8,11 @@ import java.util.*
 
 interface GroupServiceClient {
     fun loadGroup(groupId: UUID): GroupProjection
-    fun loadGroupPosts(groupId: UUID, size: Int, page: Int): List<PostProjection>
+    fun loadGroupPosts(groupId: UUID): List<PostProjection>
+
+    fun loadPosts( profile: UUID,  page: Int,  size: Int): List<PostProjection>
+
+    fun loadPostsWitGroupPosts(page: Int,  size: Int): List<PostProjection>
 }
 
 

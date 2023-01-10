@@ -5,9 +5,7 @@ import java.util.*
 
 data class CommentCreateProjection(
     val postId: UUID,
-    val authorId: UUID? = null,
-    val text: String? = null,
-    val sentTime: LocalDateTime? = null)
+    val text: String? = null)
 
 data class CommentProjection(
     val commentId: UUID? = null,

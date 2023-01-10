@@ -6,18 +6,15 @@ import com.example.applicationservice.GroupService
 import com.example.applicationservice.PostService
 import com.example.applicationservice.SessionStorage
 import com.example.configuration.routes
+import com.example.entity.Group
 import com.example.service.Listeners
 import com.example.servicechassis.*
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.runApplication
 import org.springframework.cloud.openfeign.EnableFeignClients
-import org.springframework.context.annotation.Configuration
 import org.springframework.context.support.beans
-import org.springframework.core.env.get
 import org.springframework.kafka.annotation.EnableKafka
-import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import java.util.function.Predicate
 
 @EnableKafka
@@ -43,7 +40,7 @@ fun main(args: Array<String>) {
                         filterChain(ref(), ::devRestrictions)
                     }
                     bean {
-                        GroupService(ref(), ref(), ref()) { true }
+                        GroupService(ref(), ref(), ref(), { true }, ref())
                     }
                     bean {
                         GroupPostService(ref(), ref(), ref(), ref(), ref()) { true }
@@ -56,9 +53,10 @@ fun main(args: Array<String>) {
                         filterChain(ref(), ::prodRestriction)
                     }
                     bean {
-                        GroupService(ref(), ref(), ref()) {
+                        val x = Predicate<Group> {
                             it.isAdministrator(ref<SessionStorage>().sessionOwner.userId!!)
                         }
+                        GroupService(ref(), ref(), ref(), x, ref())
                     }
                     bean {
                         GroupPostService(ref(), ref(), ref(), ref(), ref()) {

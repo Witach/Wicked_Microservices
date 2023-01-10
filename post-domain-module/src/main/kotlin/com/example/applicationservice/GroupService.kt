@@ -1,6 +1,8 @@
 package com.example.applicationservice
 
 import com.example.GroupCreateProjection
+import com.example.GroupId
+import com.example.GroupProjection
 import com.example.ProfileProjectionWithFollow
 import com.example.entity.Group
 import com.example.event.GroupCreated
@@ -10,6 +12,7 @@ import com.example.event.RemoveProfileEvent
 import com.example.repository.*
 import org.example.EntityNotFoundException
 import org.example.EventPublisher
+import org.example.RequiredParamsNotIncludedException
 import java.util.*
 import java.util.function.Predicate
 
@@ -17,7 +20,8 @@ class GroupService(
     private val groupRepository: GroupRepository,
     private val profileService: ProfileService,
     private val eventPublisher: EventPublisher,
-    private val administratorPolicy: Predicate<Group>
+    private val administratorPolicy: Predicate<Group>,
+    private val groupPostService: GroupPostService,
 ) {
 
     fun addProfile(profile: ProfileProjectionWithFollow, group: UUID) {
@@ -62,6 +66,12 @@ class GroupService(
 
     fun existsById(group: UUID): Boolean {
         return groupRepository.existById(group)
+    }
+
+    fun fetchGroup(group: GroupId): GroupProjection {
+        val groupVal = groupRepository.findById(group.groupId) ?: throw EntityNotFoundException(Group::class.java, group.groupId)
+        val posts = groupPostService.getGroupPosts(groupVal.groupInt)
+        return groupVal.toProjection(posts)
     }
 
 }

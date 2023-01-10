@@ -3,10 +3,12 @@ package abstractcom.example.applicationservice
 import com.example.CommentCreateProjection
 import com.example.ReplyCreateProjection
 import com.example.ReplyEdtProjection
+import com.example.applicationservice.SessionStorage
 import com.example.entity.Comment
 import com.example.entity.Post
 import com.example.event.CommentCreatedEvent
 import com.example.event.CommentDeletedEvent
+import com.example.repository.AllPostsRepository
 import com.example.repository.CommentRepository
 import org.example.EntityNotFoundException
 import org.example.EventPublisher
@@ -16,14 +18,16 @@ import java.util.*
 class CommentService(
     private val commentRepository: CommentRepository,
     private val eventPublisher: EventPublisher,
+    private val sessionStorage: SessionStorage,
+    private val allPostsRepository: AllPostsRepository
 ) {
     fun addComment(comment: CommentCreateProjection) {
-        if(commentRepository.existById(comment.postId)) {
+        if(allPostsRepository.checkIfPostExsists(comment.postId)) {
             val createdComment = commentRepository.save(
                 Comment(
                     commentId = UUID.randomUUID(),
                     postId = comment.postId,
-                    authorId = comment.authorId,
+                    authorId = sessionStorage.sessionOwner.userId!!,
                     text = comment.text,
                     sentTime = LocalDateTime.now()
                 )
@@ -53,7 +57,6 @@ class CommentService(
             commentRepository.save(it)
             eventPublisher.publish(event, "reply-edited-event")
         } ?: throw EntityNotFoundException(Comment::class.java, commentId)
-
     }
 
     fun removeReply(commentId: UUID, reply: UUID) {

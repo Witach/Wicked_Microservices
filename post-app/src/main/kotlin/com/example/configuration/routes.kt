@@ -1,6 +1,7 @@
 package com.example.configuration
 
 import abstractcom.example.applicationservice.CommentService
+import com.example.GroupId
 import com.example.GroupIds
 import com.example.applicationservice.GroupPostService
 import com.example.applicationservice.GroupService
@@ -10,6 +11,7 @@ import com.example.servicechassis.paraMap
 import org.example.RequiredParamsNotIncludedException
 import org.example.toUUID
 import org.springframework.web.servlet.function.*
+import org.springframework.web.servlet.function.RouterFunctions.nest
 import org.springframework.web.servlet.function.RouterFunctions.route
 import java.util.*
 
@@ -25,7 +27,7 @@ fun routes(commentService: CommentService, groupPostService: GroupPostService,
             }
             POST("/{commentId}/reply") {
                 ServerResponse.ok().body(
-                    commentService.editReply(
+                    commentService.addReply(
                         it.map("commentId"),
                         it.body()
                     )
@@ -119,6 +121,11 @@ fun routes(commentService: CommentService, groupPostService: GroupPostService,
                     "exists" to groupService.existsById(it.map("groupId"))
                 ))
             }
+            GET("/{groupId}") {
+                ServerResponse.ok().body(groupService.fetchGroup(
+                    GroupId(it.map("groupId"))
+                ))
+            }
         }
         path("/post").nest {
             GET("") {
@@ -153,6 +160,17 @@ fun routes(commentService: CommentService, groupPostService: GroupPostService,
                     postService.deletePostAttachment(
                         it.map("postId"),
                         it.map("attachmentId")
+                    )
+                )
+            }
+        }
+        path("/feed").nest {
+            GET("") {
+                ServerResponse.ok().body(
+                    postService.loadAllPosts(
+                        it.body(),
+                        it.paraMap("page") ?: 0,
+                        it.paraMap("size") ?: 20
                     )
                 )
             }

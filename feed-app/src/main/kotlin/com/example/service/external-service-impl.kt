@@ -1,8 +1,7 @@
 package com.example.service
 
-import com.example.GroupProjection
-import com.example.PostProjection
-import com.example.ProfileProjection
+import com.example.*
+import com.example.applicationservice.SessionStorage
 import com.example.domainservice.GroupServiceClient
 import com.example.domainservice.PostServiceClient
 import com.example.domainservice.ProfileServiceClient
@@ -10,24 +9,37 @@ import org.springframework.stereotype.Component
 import java.util.*
 
 @Component
-class GroupServiceClientImpl(val groupServiceFeignClient: GroupServiceFeignClient): GroupServiceClient {
+class GroupServiceClientImpl(val groupServiceFeignClient: GroupServiceFeignClient,
+                             val profileServiceFeignClient: ProfileServiceFeignClient,
+                             val sessionStorage: SessionStorage
+): GroupServiceClient {
     override fun loadGroup(groupId: UUID): GroupProjection {
         return groupServiceFeignClient.loadGroup(groupId)
     }
 
-    override fun loadGroupPosts(groupId: UUID, size: Int, page: Int): List<PostProjection> {
-        return groupServiceFeignClient.loadGroupPosts(groupId, page, size)
+    override fun loadGroupPosts(groupId: UUID): List<PostProjection> {
+        return groupServiceFeignClient.loadGroupPosts(groupId)
+    }
+
+    override fun loadPosts(profile: UUID, page: Int, size: Int): List<PostProjection> {
+        return groupServiceFeignClient.loadPosts(ProfileToSearchForProjection(mutableListOf(profile)), page, size)
+    }
+
+    override fun loadPostsWitGroupPosts(page: Int, size: Int): List<PostProjection> {
+
+        val profileData = profileServiceFeignClient.loadProfileData(sessionStorage.sessionOwner.userId!!)
+        return groupServiceFeignClient.loadPostsWitGroupPosts(FeedSearch(profileData.followed, profileData.groups), page, size)
     }
 }
 
 @Component
 class PostServiceClientImpl(val groupServiceFeignClient: GroupServiceFeignClient): PostServiceClient {
     override fun loadPosts(profile: UUID, page: Int, size: Int): List<PostProjection> {
-        return groupServiceFeignClient.loadPosts(profile, page, size)
+        return groupServiceFeignClient.loadPosts(ProfileToSearchForProjection(mutableListOf(profile)), page, size)
     }
 
     override fun loadPostsWitGroupPosts(profile: UUID, page: Int, size: Int): List<PostProjection> {
-        return groupServiceFeignClient.loadPosts(profile, page, size)
+        return groupServiceFeignClient.loadPosts(ProfileToSearchForProjection(mutableListOf(profile)), page, size)
     }
 }
 

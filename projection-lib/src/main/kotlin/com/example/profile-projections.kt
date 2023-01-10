@@ -23,10 +23,11 @@ data class ProfileEditProjection(
 
 data class ProfileProjection(
     val profileID: UUID,
-    var username: String?,
+    var username: String,
     @DateTimeFormat(pattern="yyyy-MM-dd") var birthday: LocalDate?,
     val userId: UUID,
-    var avatar: String,
+    val groups: MutableSet<UUID> = mutableSetOf(),
+    val followed: MutableSet<UUID> = mutableSetOf(),
 )
 
 data class ProfileProjectionWithFollow(

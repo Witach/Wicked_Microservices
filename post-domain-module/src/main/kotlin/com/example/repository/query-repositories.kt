@@ -26,4 +26,8 @@ interface AllPostsRepository {
     fun findAll(): List<Post>
 
     fun findAllByAuthorIn(profiles: Set<UUID>, page: Int, size: Int): List<Post>
+
+    fun checkIfPostExsists(postId: UUID): Boolean
+
+    fun feed(profiles: Set<UUID>, groups: List<UUID>, page: Int, size: Int): List<Post>
 }

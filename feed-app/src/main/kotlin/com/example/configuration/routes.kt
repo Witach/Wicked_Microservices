@@ -12,21 +12,19 @@ fun routes(groupServiceClientImpl: GroupServiceClientImpl,
            postServiceClientImpl: PostServiceClientImpl,
            profileServiceClientImpl: ProfileServiceClientImpl): RouterFunction<ServerResponse> {
     return router {
-        "/feed".nest {
+        path("/feed").nest {
             GET("/{groupId}") {
                 ok().body(groupServiceClientImpl.loadGroup(it.pathVariable("groupId").toUUID()))
             }
             GET("/{groupId}/post") {
                 ok().body(
                     groupServiceClientImpl.loadGroupPosts(
-                        it.pathVariable("groupId").toUUID(),
-                        it.param("size").map(String::toInt).orElse(null),
-                        it.param("page").map(String::toInt).orElse(1)
+                        it.pathVariable("groupId").toUUID()
                     )
                 )
             }
         }
-        "/feed".nest {
+        path("/feed").nest {
             GET("/{profileId}") {
                 ServerResponse.ok().body(
                     postServiceClientImpl.loadPosts(

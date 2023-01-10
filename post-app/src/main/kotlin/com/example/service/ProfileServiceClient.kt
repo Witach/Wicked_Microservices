@@ -18,11 +18,11 @@ import java.util.*
 @Profile("feign")
 class ProfileServiceClientFeign(val profileServiceFeignClient: ProfileServiceFeignClient): ProfileService {
     override fun addGroupToProfile(group: UUID, profile: UUID) {
-        profileServiceFeignClient.addGroupToProfile(profile, GroupId(group))
+        profileServiceFeignClient.addGroupToProfile(profile, group)
     }
 
     override fun removeGroupFromProfile(group: UUID, profile: UUID) {
-        profileServiceFeignClient.removeGroupFromProfile(profile, GroupId(group))
+        profileServiceFeignClient.removeGroupFromProfile(profile, group)
     }
 
     override fun removeGroupFromProfiles(group: UUID, profile: Set<UUID>) {

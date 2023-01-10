@@ -18,7 +18,7 @@ import java.util.*
 @Profile("feign")
 class GroupServiceClientImpl(val groupServiceFeignClient: GroupServiceFeignClient): GroupServiceClient {
     override fun existsById(group: UUID): Boolean {
-        return groupServiceFeignClient.existsById(group).isExistsing
+        return groupServiceFeignClient.existsById(group).exists
     }
 }
 

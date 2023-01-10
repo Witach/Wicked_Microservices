@@ -15,6 +15,7 @@ import org.example.EventPublisher
 import org.example.RequiredParamsNotIncludedException
 import java.util.*
 import java.util.function.Predicate
+import kotlin.math.log
 
 class GroupService(
     private val groupRepository: GroupRepository,
@@ -65,7 +66,9 @@ class GroupService(
     }
 
     fun existsById(group: UUID): Boolean {
-        return groupRepository.existById(group)
+        val x = groupRepository.existById(group)
+        println(x)
+        return x
     }
 
     fun fetchGroup(group: GroupId): GroupProjection {

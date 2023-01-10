@@ -48,7 +48,6 @@ class AllPostsRepositoryImpl(val allPostsJpaRepository: AllPostsJpaRepository, v
             match(Criteria.where("_id").`is`(postId)),
             count().`as`("count")
         ).withOptions(newAggregationOptions().allowDiskUse(true).build())
-
         return mongoTemplate.aggregate(aggregation, "posts", Map::class.java)
             .mappedResults
             .first()["count"] as Int > 0

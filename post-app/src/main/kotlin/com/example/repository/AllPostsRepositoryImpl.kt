@@ -17,6 +17,7 @@ class AllPostsRepositoryImpl(val allPostsJpaRepository: AllPostsJpaRepository, v
     override fun findAll(): List<Post> {
         return allPostsJpaRepository.findAll().toList().map { it.toPost(mutableListOf()) }
 
+
     }
 
     override fun findAllByAuthorIn(profiles: Set<UUID>, page: Int, size: Int): List<Post> {

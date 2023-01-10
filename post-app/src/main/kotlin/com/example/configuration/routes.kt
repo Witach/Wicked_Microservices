@@ -1,18 +1,15 @@
 package com.example.configuration
 
 import abstractcom.example.applicationservice.CommentService
+import com.example.FeedSearch
 import com.example.GroupId
-import com.example.GroupIds
+import com.example.ProfileToSearchForProjection
 import com.example.applicationservice.GroupPostService
 import com.example.applicationservice.GroupService
 import com.example.applicationservice.PostService
 import com.example.servicechassis.map
 import com.example.servicechassis.paraMap
-import org.example.RequiredParamsNotIncludedException
-import org.example.toUUID
 import org.springframework.web.servlet.function.*
-import org.springframework.web.servlet.function.RouterFunctions.nest
-import org.springframework.web.servlet.function.RouterFunctions.route
 import java.util.*
 
 fun routes(commentService: CommentService, groupPostService: GroupPostService,
@@ -67,14 +64,14 @@ fun routes(commentService: CommentService, groupPostService: GroupPostService,
             }
             GET("/{postId}") {
                 ServerResponse.ok().body(
-                    groupPostService.getGroupPosts(
+                    groupPostService.getGroupPostsById(
                         it.map("postId")
                     )
                 )
             }
             GET("/posts/{groupId}") {
                 ServerResponse.ok().body(
-                    groupPostService.getGroupPosts(
+                    groupPostService.getGroupPostsById(
                         UUID.fromString(it.pathVariable("groupId")),
                     )
                 )
@@ -82,7 +79,10 @@ fun routes(commentService: CommentService, groupPostService: GroupPostService,
             GET("") {
                 ServerResponse.ok().body(
                     groupPostService.getGroupPosts(
-                        it.body<GroupIds>()
+                        it.param("groupIds")
+                            .map { it.split(",")
+                                .map { UUID.fromString(it) } }
+                            .orElse(emptyList()),
                     )
                 )
             }
@@ -131,7 +131,11 @@ fun routes(commentService: CommentService, groupPostService: GroupPostService,
             GET("") {
                 ServerResponse.ok().body(
                     postService.loadPostsPage(
-                        it.body(),
+                        ProfileToSearchForProjection(
+                            it.param("proj").map { it.split(",")
+                                .map { UUID.fromString(it) } }
+                                .orElse(emptyList()),
+                        ),
                         it.paraMap("page") ?: 0,
                         it.paraMap("size") ?: 20
                     )
@@ -168,7 +172,16 @@ fun routes(commentService: CommentService, groupPostService: GroupPostService,
             GET("") {
                 ServerResponse.ok().body(
                     postService.loadAllPosts(
-                        it.body(),
+                        FeedSearch(
+                            it.param("profiles")
+                                .map { it.split(",").map { UUID.fromString(it) } }
+                                .map { it.toSet()}
+                                .orElse(emptySet()),
+                            it.param("groups")
+                                .map { it.split(",").map { UUID.fromString(it) } }
+                                .map { it.toSet()}
+                                .orElse(emptySet())
+                        ),
                         it.paraMap("page") ?: 0,
                         it.paraMap("size") ?: 20
                     )

@@ -8,9 +8,7 @@ import com.example.applicationservice.PostService
 import com.example.servicechassis.KafkaClient
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.apache.kafka.clients.consumer.ConsumerRecord
-import org.springframework.context.annotation.Profile
 import org.springframework.kafka.annotation.KafkaListener
-import org.springframework.stereotype.Service
 import java.util.*
 
 class Listeners(val objectMapper: ObjectMapper,
@@ -62,7 +60,7 @@ class Listeners(val objectMapper: ObjectMapper,
     @KafkaListener(topics = ["get-grouppost-message"], groupId = "get-grouppost-message-consumer")
     fun `get-grouppost-message`(record: ConsumerRecord<String, String>) {
         val map = objectMapper.readValue(record.value(), Map::class.java)
-        val res = groupPostService.getGroupPosts(UUID.fromString(map["postId"] as String))
+        val res = groupPostService.getGroupPostsById(UUID.fromString(map["postId"] as String))
         kafkaClient.send("get-grouppost-response",  record.key(), mapOf("group" to res));
     }
 

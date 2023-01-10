@@ -12,7 +12,7 @@ fun routes(groupServiceClientImpl: GroupServiceClientImpl,
            postServiceClientImpl: PostServiceClientImpl,
            profileServiceClientImpl: ProfileServiceClientImpl): RouterFunction<ServerResponse> {
     return router {
-        path("/feed").nest {
+        path("/feed/group").nest {
             GET("/{groupId}") {
                 ok().body(groupServiceClientImpl.loadGroup(it.pathVariable("groupId").toUUID()))
             }
@@ -24,13 +24,13 @@ fun routes(groupServiceClientImpl: GroupServiceClientImpl,
                 )
             }
         }
-        path("/feed").nest {
+        path("/feed/profile").nest {
             GET("/{profileId}") {
                 ServerResponse.ok().body(
                     postServiceClientImpl.loadPosts(
                         it.pathVariable("profileId").toUUID(),
-                        it.param("size").map(String::toInt).orElse(null),
-                        it.param("page").map(String::toInt).orElse(1)
+                        it.param("page").map(String::toInt).orElse(0),
+                        it.param("size").map(String::toInt).orElse(20)
                     )
                 )
             }
@@ -38,16 +38,17 @@ fun routes(groupServiceClientImpl: GroupServiceClientImpl,
                 ServerResponse.ok().body(
                     postServiceClientImpl.loadPostsWitGroupPosts(
                         it.pathVariable("profileId").toUUID(),
-                        it.param("size").map(String::toInt).orElse(null),
-                        it.param("page").map(String::toInt).orElse(1)
+                        it.param("page").map(String::toInt).orElse(0),
+                        it.param("size").map(String::toInt).orElse(20)
                     )
                 )
             }
         }
-        GET("profile/feed/{profileId}") {
+        GET("/feed/{profileId}/all") {
             ServerResponse.ok().body(
-                profileServiceClientImpl.loadProfileData(
-                    it.pathVariable("profileId").toUUID()
+                groupServiceClientImpl.loadPostsWitGroupPosts(
+                    it.param("page").map(String::toInt).orElse(0),
+                    it.param("size").map(String::toInt).orElse(20)
                 )
             )
         }

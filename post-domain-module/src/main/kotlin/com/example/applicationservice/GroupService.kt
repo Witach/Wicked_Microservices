@@ -12,10 +12,8 @@ import com.example.event.RemoveProfileEvent
 import com.example.repository.*
 import org.example.EntityNotFoundException
 import org.example.EventPublisher
-import org.example.RequiredParamsNotIncludedException
 import java.util.*
 import java.util.function.Predicate
-import kotlin.math.log
 
 class GroupService(
     private val groupRepository: GroupRepository,
@@ -73,7 +71,7 @@ class GroupService(
 
     fun fetchGroup(group: GroupId): GroupProjection {
         val groupVal = groupRepository.findById(group.groupId) ?: throw EntityNotFoundException(Group::class.java, group.groupId)
-        val posts = groupPostService.getGroupPosts(groupVal.groupInt)
+        val posts = groupPostService.getGroupPostsById(groupVal.groupInt)
         return groupVal.toProjection(posts)
     }
 

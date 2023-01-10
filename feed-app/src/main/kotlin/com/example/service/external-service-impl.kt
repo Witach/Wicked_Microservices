@@ -22,24 +22,25 @@ class GroupServiceClientImpl(val groupServiceFeignClient: GroupServiceFeignClien
     }
 
     override fun loadPosts(profile: UUID, page: Int, size: Int): List<PostProjection> {
-        return groupServiceFeignClient.loadPosts(ProfileToSearchForProjection(mutableListOf(profile)), page, size)
+        return groupServiceFeignClient.loadPosts(mutableListOf(profile), page, size)
     }
 
     override fun loadPostsWitGroupPosts(page: Int, size: Int): List<PostProjection> {
 
         val profileData = profileServiceFeignClient.loadProfileData(sessionStorage.sessionOwner.userId!!)
-        return groupServiceFeignClient.loadPostsWitGroupPosts(FeedSearch(profileData.followed, profileData.groups), page, size)
+        return groupServiceFeignClient.loadPostsWitGroupPosts(profileData.followed.toMutableList(),
+            profileData.groups.toMutableList(), page, size)
     }
 }
 
 @Component
 class PostServiceClientImpl(val groupServiceFeignClient: GroupServiceFeignClient): PostServiceClient {
     override fun loadPosts(profile: UUID, page: Int, size: Int): List<PostProjection> {
-        return groupServiceFeignClient.loadPosts(ProfileToSearchForProjection(mutableListOf(profile)), page, size)
+         return groupServiceFeignClient.loadPosts(mutableListOf(profile), page, size)
     }
 
     override fun loadPostsWitGroupPosts(profile: UUID, page: Int, size: Int): List<PostProjection> {
-        return groupServiceFeignClient.loadPosts(ProfileToSearchForProjection(mutableListOf(profile)), page, size)
+        return groupServiceFeignClient.loadPosts(mutableListOf(profile), page, size)
     }
 }
 

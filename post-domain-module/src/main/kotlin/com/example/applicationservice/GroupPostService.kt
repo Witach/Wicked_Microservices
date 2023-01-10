@@ -13,7 +13,6 @@ import com.example.repository.*
 import org.example.EntityNotFoundException
 import org.example.EventPublisher
 import org.example.NoAuthenticationAvailableException
-import java.lang.IllegalArgumentException
 import java.time.LocalDateTime
 import java.util.*
 import java.util.function.Predicate
@@ -61,7 +60,7 @@ class GroupPostService(
         } ?: throw EntityNotFoundException(GroupPost::class.java, postUUID)
     }
 
-    fun getGroupPosts(groupId: UUID): List<PostProjection> {
+    fun getGroupPostsById(groupId: UUID): List<PostProjection> {
         return groupRepository.findById(groupId)?.let {group ->
             if(permissionPolicy.test(group)) {
                 groupPostRepository.findByGroupId(groupId).map { it.toPostProjection() }
@@ -69,9 +68,9 @@ class GroupPostService(
         } ?: throw NoAuthenticationAvailableException()
     }
 
-    fun getGroupPosts(groupIds: GroupIds): List<PostProjection> {
+    fun getGroupPosts(groupIds: List<UUID>): List<PostProjection> {
         return groupPostRepository.findAllByGroupIdAndCheckPermission(
-            sessionStorage.sessionOwner.userId!!, groupIds.groupIds)
+            sessionStorage.sessionOwner.userId!!, groupIds)
             .map { it.toPostProjection() }
     }
 

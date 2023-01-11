@@ -80,19 +80,19 @@ val circutSpec = { resielicenceConfig: GatewayFilterSpec ->
 fun routingProd(builder: RouteLocatorBuilder): RouteLocator {
     return builder.routes()
         .route {
-            it.path("/feed*", "/feed*", "profile/feed/*")
+            it.path("/feed**", "/feed/**", "profile/feed/**")
                 .filters(circutSpec)
                 .uri("lb://feed-app")
         }.route {
-            it.path("/comment*", "/comment/*", "/group*", "/group/*", "/post*", "/post/*" )
+            it.path("/comment**", "/comment/**", "/group**", "/group/**", "/post**", "/post/**" )
                 .filters(circutSpec)
                 .uri("lb://post-app")
         }.route {
-            it.path("/profile*", "/profile/*", "/user*", "/user/*")
+            it.path("/profile**", "/profile/**", "/user**", "/user/**")
                 .filters(circutSpec)
                 .uri("lb://profile-app")
         }.route {
-            it.path("/auth*", "/auth*/")
+            it.path("/auth**", "/auth**/")
                 .filters { filterspec ->
                     filterspec.rewritePath("/auth/(?<remaining>.*)",
                         "/auth/realms/SocialApp/protocol/openid-connect/\${remaining}")
@@ -104,20 +104,20 @@ fun routingProd(builder: RouteLocatorBuilder): RouteLocator {
 fun routingDev(builder: RouteLocatorBuilder): RouteLocator {
     return builder.routes()
         .route {
-            it.path("/user/*", "/user*")
+            it.path("/user/**", "/user**")
                 .uri("lb://profile-app")
         }
         .route {
-            it.path("/feed*", "/feed*", "profile/feed/*")
+            it.path("/feed**", "/feed/**", "profile/feed/**")
                 .uri("lb://feed-app")
         }.route {
-            it.path("/comment*", "/comment/*", "/group*", "/group/*", "/post*", "/post/*" )
+            it.path("/comment**", "/comment/**", "/group**", "/group/**", "/post**", "/post/**" )
                 .uri("lb://post-app")
         }.route {
-            it.path("/profile*", "/profile/*", "/user*", "/user/*")
+            it.path("/profile**", "/profile/**", "/user**", "/user/**")
                 .uri("lb://profile-app")
         }.route {
-            it.path("/auth*", "/auth/*")
+            it.path("/auth**", "/auth/**")
                 .filters { filterspec ->
                     filterspec.rewritePath("/auth/(?<remaining>.*)",
                         "/auth/realms/SocialApp/protocol/openid-connect/\${remaining}")

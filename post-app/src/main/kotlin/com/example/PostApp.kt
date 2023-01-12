@@ -27,13 +27,12 @@ fun main(args: Array<String>) {
     runApplication<PostApp>(*args) {
         addInitializers(
             beans {
-                kafkaProducers(this, env.activeProfiles)
+                kafkaProducers(this)
                 bean<CommentService>()
                 bean<PostService>()
                 bean {
                     routes(ref(), ref(), ref(), ref())
                 }
-                kafkaConsumer(this)
                 beanDefinitions(this)
                 profile("dev") {
                     bean {

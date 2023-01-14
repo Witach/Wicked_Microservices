@@ -3,7 +3,6 @@ package com.example.applicationservice
 import com.example.*
 import com.example.entity.Attachment
 import com.example.entity.Post
-import com.example.event.PostAddedEvent
 import com.example.event.PostRemovedEvent
 import com.example.repository.AllPostsRepository
 import com.example.repository.CommentRepository
@@ -44,7 +43,7 @@ public class PostService(
                 type = Attachment.AttachmentType.valueOf(it.type.toString())
             ) }?.toMutableList() ?: mutableListOf()
         ))
-        eventPublisher.publish(PostAddedEvent(createdPost), "post-created-event")
+//        eventPublisher.publish(PostAddedEvent(createdPost), "post-created-event")
     }
 
     fun deletePost(postUUID: UUID) {

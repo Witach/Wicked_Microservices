@@ -7,7 +7,10 @@ import com.example.applicationservice.PostService
 import com.example.applicationservice.SessionStorage
 import com.example.configuration.routes
 import com.example.entity.Group
-import com.example.service.Listeners
+import com.example.service.CommentListener
+import com.example.service.GroupListener
+import com.example.service.GroupPostListener
+import com.example.service.PostListener
 import com.example.servicechassis.*
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -46,8 +49,7 @@ fun main(args: Array<String>) {
                     }
                 }
                 profile("prod") {
-                    bean<KafkaClient>()
-                    bean<Listeners>()
+
                     bean {
                         filterChain(ref(), ::prodRestriction)
                     }
@@ -62,6 +64,13 @@ fun main(args: Array<String>) {
                             it.profiles.contains(ref<SessionStorage>().sessionOwner.userId!!)
                         }
                     }
+                }
+                profile("kafka") {
+                    bean<CommentListener>()
+                    bean<GroupPostListener>()
+                    bean<GroupListener>()
+                    bean<PostListener>()
+                    bean<KafkaObjectMapper>()
                 }
             }
         )

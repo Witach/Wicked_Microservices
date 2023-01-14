@@ -138,12 +138,20 @@ services:
     environment:
       - ALLOW_PLAINTEXT_LISTENER=yes
       - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=3
+      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=3
+      - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=2
     networks:
       - social-app
     ports:
       - "9093:9092"
+      - "9092:9092"
+      - "8082:8082"
     expose:
       - "9093"
+      - "9092"
+      - "8082"
     depends_on:
       - zookeeper
 #    profiles:

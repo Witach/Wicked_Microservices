@@ -32,5 +32,9 @@ auth-server:
 
 kafka:
   bootstrapServer: localhost:9092
+  topics:
+    - profile-get-response
+    - post-getall-response
+    - group-get-response
 server:
-  port: 8082
+  port: 8088

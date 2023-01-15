@@ -42,7 +42,7 @@ kafka:
     - grouppost-delete-response
     - grouppost-get-response
     - grouppost-update-response
-    - grouppost-get-response
+    - grouppost-getall-response
     - post-create-response
     - post-delete-response
     - post-update-response
@@ -51,9 +51,27 @@ kafka:
     - post-get-response
     - feed-get-response
     - group-exists-response
+    - profile-update-response
+    - profile-addtogroup-response
+    - profile-removefromgroup-response
+    - profile-starttofollow-response
+    - profile-stoptofollow-response
+    - user-creat-response
+    - user-delete-response
+    - user-update-response
+    - profile-getall-response
+    - profile-get-response
+    - user-get-response
+    - user-getall-response
+    - feed-loadgroup-response
+    - feed-loadgrouppost-response
+    - feed-loadprofilepost-response
+    - feed-search-response
 
 management:
   endpoints:
     web:
       exposure:
         include": '*'
+
+

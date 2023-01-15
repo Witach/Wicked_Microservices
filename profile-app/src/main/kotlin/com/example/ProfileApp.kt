@@ -1,5 +1,7 @@
 package com.example
 
+import com.example.configuration.EventListeners
+import com.example.configuration.Listeners
 import com.example.configuration.routes
 import com.example.service.ProfileService
 import com.example.service.UserService
@@ -20,9 +22,10 @@ fun main(args: Array<String>) {
         addInitializers(
             beans {
                 beanDefinitions(this)
-                kafkaConsumer(this)
-                kafkaProducers(this, env.activeProfiles)
-                bean<ProfileService>()
+                bothKafka(this)
+                bean {
+                    ProfileService(ref(), ref(), ref(), ref())
+                }
                 bean<UserService>()
                 profile("dev") {
                     bean {
@@ -34,10 +37,19 @@ fun main(args: Array<String>) {
                         filterChain(ref(), ::prodRestriction)
                     }
                 }
-                bean {
-                    routes(ref(), ref())
+                profile("feign") {
+                    bean {
+                        routes(ref(), ref())
+                    }
                 }
-
+                profile("kafka") {
+                    bean<KafkaObjectMapper>()
+                    bean<Listeners>()
+                    bean<EventListeners>()
+                    bean {
+                        ImperativeSessionStorage()
+                    }
+                }
             }
         )
     }

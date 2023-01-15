@@ -39,14 +39,7 @@ auth-server:
 kafka:
   bootstrapServer: localhost:9092
   topics:
-    - profile-created-event
-    - profile-updated-event
-    - profile-unfolowed-event
-    - profile-folowed-event
-    - profile-removedfromgroup-event
-    - user-updated-event
-    - user-created-event
-    - user-deleted-event
+    - group-exists-response
 
 management:
   endpoints:
@@ -54,7 +47,3 @@ management:
       exposure:
         include": '*'
 
-logging:
-  level:
-    root: debug
-    web: debug

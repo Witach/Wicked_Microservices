@@ -1,6 +1,7 @@
 package com.example
 
 import com.example.servicechassis.KafkaObjectMapper
+import com.example.servicechassis.kafkaProxy
 import org.springframework.kafka.requestreply.ReplyingKafkaTemplate
 import org.springframework.web.servlet.function.RouterFunction
 import org.springframework.web.servlet.function.ServerResponse
@@ -15,7 +16,7 @@ fun postRoutes(replyingKafakTemplate: ReplyingKafkaTemplate<String, String, Stri
                     requestTopic = "post-create-request"
                     responseTopic = "post-create-response"
                     kafkaTemplate = replyingKafakTemplate
-                    post = kafkaObjectMapper.convertToMessageFromBody(it.body())
+                    post = kafkaObjectMapper.convertToMessageFromBodyObject(it.body())
                 } ()
             }
             GET("") {
@@ -23,7 +24,7 @@ fun postRoutes(replyingKafakTemplate: ReplyingKafkaTemplate<String, String, Stri
                     requestTopic = "post-get-request"
                     responseTopic = "post-get-response"
                     kafkaTemplate = replyingKafakTemplate
-                    post = kafkaObjectMapper.convertToMessageFromBody(it.body())
+                    post = kafkaObjectMapper.convertToMessageFromBodyObject(it.body())
                 } ()
             }
             DELETE("{profileId}") {

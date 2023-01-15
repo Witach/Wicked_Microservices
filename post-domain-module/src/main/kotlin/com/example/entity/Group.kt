@@ -7,8 +7,7 @@ import com.example.event.AdministratorRemovedEvent
 import com.example.event.ProfileAddedEvent
 import com.example.event.RemoveProfileEvent
 import org.example.DDDEntity
-import java.util.UUID
-import java.util.function.Predicate
+import java.util.*
 
 class Group(
     val groupInt: UUID,

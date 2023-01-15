@@ -14,6 +14,14 @@ class SessionStorageImpl: SessionStorage {
         }
 }
 
+class ImperativeSessionStorage: SessionStorage {
+    var userId: UUID? = null
+    override val sessionOwner: SessionStorage.UserInfo
+        get()   {
+            return SessionStorage.UserInfo("", userId)
+        }
+}
+
 class SessionStorageMock: SessionStorage {
     override val sessionOwner: SessionStorage.UserInfo
         get()   {

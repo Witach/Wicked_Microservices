@@ -12,11 +12,13 @@ import java.util.*
 class PostListener(
     val kafkaObjectMapper: KafkaObjectMapper,
     val postService: PostService,
-    val groupService: GroupService
+    val groupService: GroupService,
+    val imperativeSessionStorage: ImperativeSessionStorage
 ) {
     @KafkaListener(topics = ["post-create-request"])
     @SendTo("post-create-response")
     fun `create-post-message`(record: String): String {
+        imperativeSessionStorage.userId = kafkaObjectMapper.readSession(record)
         val body = kafkaObjectMapper.readBody(record, PostCreatePorjection::class.java)
         try {
             postService.addPost(body)
@@ -30,6 +32,7 @@ class PostListener(
     @KafkaListener(topics = ["post-delete-request"])
     @SendTo("post-delete-response")
     fun `delete-post-message`(record: String): String {
+        imperativeSessionStorage.userId = kafkaObjectMapper.readSession(record)
         val map = kafkaObjectMapper.readPathVariable(record, "profileId")
         try {
             postService.deletePost(map)
@@ -43,6 +46,7 @@ class PostListener(
     @KafkaListener(topics = ["post-update-request"])
     @SendTo("post-update-response")
     fun `update-post-message`(record: String): String {
+        imperativeSessionStorage.userId = kafkaObjectMapper.readSession(record)
         val body = kafkaObjectMapper.readBody(record, UpdatePostProjection::class.java)
         val postId = kafkaObjectMapper.readPathVariable(record, "postId")
         try {
@@ -57,6 +61,7 @@ class PostListener(
     @KafkaListener(topics = ["post-deleteattachment-request"])
     @SendTo("post-deleteattachment-response")
     fun `deleteattachment-post-message`(record: String): String {
+        imperativeSessionStorage.userId = kafkaObjectMapper.readSession(record)
         val postId = kafkaObjectMapper.readPathVariable(record, "postId")
         val attachmentId = kafkaObjectMapper.readPathVariable(record, "attachmentId")
         try {
@@ -71,6 +76,7 @@ class PostListener(
     @KafkaListener(topics = ["post-addattachment-request"])
     @SendTo("post-addattachment-response")
     fun `group-exists-message`(record: String): String {
+        imperativeSessionStorage.userId = kafkaObjectMapper.readSession(record)
         val map = kafkaObjectMapper.readPathVariable(record, "postId")
         val res = groupService.existsById(map)
         return kafkaObjectMapper.convertToMessageFromBodyObject(res)
@@ -79,6 +85,7 @@ class PostListener(
     @KafkaListener(topics = ["post-get-request"])
     @SendTo("post-get-response")
     fun `post-get-request`(record: String): String {
+        imperativeSessionStorage.userId = kafkaObjectMapper.readSession(record)
         val map = kafkaObjectMapper.readBody(record, ProfileToSearchForProjection::class.java)
         val page = kafkaObjectMapper.readParameter(record, "page", Int::class.java) ?: 0
         val size = kafkaObjectMapper.readParameter(record, "size", Int::class.java) ?: 20
@@ -93,9 +100,10 @@ class PostListener(
 
     }
 
-    @KafkaListener(topics = ["feed-get-request"])
-    @SendTo("feed-get-response")
+    @KafkaListener(topics = ["post-getall-request"])
+    @SendTo("post-getall-response")
     fun `feed-get-request`(record: String): String {
+        imperativeSessionStorage.userId = kafkaObjectMapper.readSession(record)
         val feedSearch = kafkaObjectMapper.readBody(record, FeedSearch::class.java)
         return try {
             val res = postService.loadAllPosts(feedSearch)

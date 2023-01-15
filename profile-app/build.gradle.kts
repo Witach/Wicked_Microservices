@@ -14,6 +14,7 @@ repositories {
 dependencies {
     implementation(project(":service-chassis"))
     implementation(project(":profile-domain-module"))
+    implementation(project(mapOf("path" to ":post-domain-module")))
 }
 
 tasks.getByName<Test>("test") {

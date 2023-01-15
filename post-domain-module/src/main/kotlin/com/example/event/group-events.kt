@@ -2,16 +2,16 @@ package com.example.event
 
 import com.example.entity.Group
 import org.example.DomainEvent
-import java.util.UUID
+import java.util.*
 
 abstract class GroupEvent: DomainEvent<Group>()
 
 class GroupCreated(val group: Group): GroupEvent()
 
-class ProfileAddedEvent(group: UUID, profile: UUID): GroupEvent()
+class ProfileAddedEvent(val group: UUID, val profile: UUID): GroupEvent()
 
-class RemoveProfileEvent(group: UUID, profile: UUID): GroupEvent()
-class RemoveProfilesEvent(group: UUID, profiles: Set<UUID>): GroupEvent()
+class RemoveProfileEvent(val group: UUID, val profile: UUID): GroupEvent()
+class RemoveProfilesEvent(val group: UUID, val profiles: Set<UUID>): GroupEvent()
 
 class AdministratorAddedEvent(val group: Group): GroupEvent()
 

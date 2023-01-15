@@ -1,4 +1,4 @@
-package com.example
+package com.example.servicechassis
 
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.producer.ProducerRecord
@@ -26,6 +26,12 @@ fun kafkaProxy(init: KafkaProxy.() -> Unit): () -> ServerResponse {
 
 fun kafkaProxyFun(requestTopic: String, responseTopic: String,
                kafkaTemplate: ReplyingKafkaTemplate<String, String, String>, post: String): ServerResponse {
+    val consumerRecord = kafkaProxyFunFeign(requestTopic, responseTopic, kafkaTemplate, post)
+    return ServerResponse.ok().body(consumerRecord)
+}
+
+fun kafkaProxyFunFeign(requestTopic: String, responseTopic: String,
+                  kafkaTemplate: ReplyingKafkaTemplate<String, String, String>, post: String): String {
 
     val record: ProducerRecord<String, String> = ProducerRecord<String, String>(requestTopic, post)
     record.headers().add(RecordHeader(KafkaHeaders.REPLY_TOPIC, responseTopic.toByteArray()))
@@ -39,5 +45,14 @@ fun kafkaProxyFun(requestTopic: String, responseTopic: String,
         )
     }
     val consumerRecord: ConsumerRecord<String, String> = sendAndReceive.get()
-    return ServerResponse.ok().body(consumerRecord.value())
+    return consumerRecord.value()
+}
+
+fun kafkaProxyFeign(init: KafkaProxy.() -> Unit): () -> String {
+    val proxy = KafkaProxy("", "", null, "")
+    proxy.init()
+    return  {
+        kafkaProxyFunFeign(proxy.requestTopic, proxy.responseTopic,
+            proxy.kafkaTemplate!!, proxy.post)
+    }
 }

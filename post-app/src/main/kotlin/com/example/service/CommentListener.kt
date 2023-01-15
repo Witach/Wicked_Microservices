@@ -5,16 +5,18 @@ import com.example.CommentCreateProjection
 import com.example.ReplyCreateProjection
 import com.example.ReplyEdtProjection
 import com.example.servicechassis.FAILURE
+import com.example.servicechassis.ImperativeSessionStorage
 import com.example.servicechassis.KafkaObjectMapper
 import com.example.servicechassis.SUCCESS
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.messaging.handler.annotation.SendTo
 import java.util.*
 
-class CommentListener(val commentService: CommentService, val kafkaObjectMapper: KafkaObjectMapper) {
+class CommentListener(val commentService: CommentService, val kafkaObjectMapper: KafkaObjectMapper, val imperativeSessionStorage: ImperativeSessionStorage) {
     @KafkaListener(topics = ["comment-create-request"])
     @SendTo("comment-create-response")
     fun `comment-create-request`(record: String): String {
+        imperativeSessionStorage.userId = kafkaObjectMapper.readSession(record)
         val comment = kafkaObjectMapper.readBody(record, CommentCreateProjection::class.java)
         try {
             commentService.addComment(comment)
@@ -28,7 +30,8 @@ class CommentListener(val commentService: CommentService, val kafkaObjectMapper:
     @KafkaListener(topics = ["comment-delete-request"])
     @SendTo("comment-delete-response")
     fun `delete-comment-message`(record: String): String {
-        val map = kafkaObjectMapper.readPathVariable(record, "commentId")
+        imperativeSessionStorage.userId = kafkaObjectMapper.readSession(record)
+        val map = kafkaObjectMapper.readPathVariable(record, "profileId")
         try {
             commentService.deleteComment(map)
         } catch (e: Exception) {
@@ -40,6 +43,7 @@ class CommentListener(val commentService: CommentService, val kafkaObjectMapper:
     @KafkaListener(topics = ["reply-create-request"])
     @SendTo("reply-create-response")
     fun `create-commentreply-message`(record: String): String {
+        imperativeSessionStorage.userId = kafkaObjectMapper.readSession(record)
         val map = kafkaObjectMapper.readPathVariable(record, "commentId")
         val body = kafkaObjectMapper.readBody(record, ReplyCreateProjection::class.java)
         try {
@@ -53,6 +57,7 @@ class CommentListener(val commentService: CommentService, val kafkaObjectMapper:
     @KafkaListener(topics = ["reply-edit-request"])
     @SendTo("reply-edit-response")
     fun `update-commentreply-message`(record: String): String {
+        imperativeSessionStorage.userId = kafkaObjectMapper.readSession(record)
         val map = kafkaObjectMapper.readPathVariable(record, "commentId")
         try {
             commentService.editReply(map, kafkaObjectMapper.readBody(record, ReplyEdtProjection::class.java))
@@ -65,6 +70,7 @@ class CommentListener(val commentService: CommentService, val kafkaObjectMapper:
     @KafkaListener(topics = ["reply-delete-request"])
     @SendTo("reply-delete-response")
     fun `delete-commentreply-message`(record: String): String {
+        imperativeSessionStorage.userId = kafkaObjectMapper.readSession(record)
         val map = kafkaObjectMapper.readPathVariable(record, "commentId")
         val reply = kafkaObjectMapper.readPathVariable(record, "replyId")
         try {

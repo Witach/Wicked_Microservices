@@ -5,9 +5,11 @@ import com.example.applicationservice.SessionStorage
 import com.example.domainservice.GroupServiceClient
 import com.example.domainservice.PostServiceClient
 import com.example.domainservice.ProfileServiceClient
+import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 import java.util.*
 
+@Profile("feign")
 @Component
 class GroupServiceClientImpl(val groupServiceFeignClient: GroupServiceFeignClient,
                              val profileServiceFeignClient: ProfileServiceFeignClient,
@@ -33,6 +35,7 @@ class GroupServiceClientImpl(val groupServiceFeignClient: GroupServiceFeignClien
     }
 }
 
+@Profile("feign")
 @Component
 class PostServiceClientImpl(val groupServiceFeignClient: GroupServiceFeignClient): PostServiceClient {
     override fun loadPosts(profile: UUID, page: Int, size: Int): List<PostProjection> {
@@ -44,6 +47,7 @@ class PostServiceClientImpl(val groupServiceFeignClient: GroupServiceFeignClient
     }
 }
 
+@Profile("feign")
 @Component
 class ProfileServiceClientImpl(val profileServiceFeignClient: ProfileServiceFeignClient): ProfileServiceClient {
     override fun loadProfileData(profile: UUID): ProfileProjection {

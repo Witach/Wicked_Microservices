@@ -1,6 +1,7 @@
 package com.example
 
 import com.example.servicechassis.KafkaObjectMapper
+import com.example.servicechassis.kafkaProxy
 import com.example.servicechassis.map
 import org.springframework.kafka.requestreply.ReplyingKafkaTemplate
 import org.springframework.web.servlet.function.RouterFunction
@@ -27,7 +28,7 @@ fun commentRoutes(replyingKafkaTemplate: ReplyingKafkaTemplate<String, String, S
                     post = kafkaObjectMapper.convertToMessageFromPathVariable ("profileId" to it.pathVariable("profileId"))
                 } ()
             }
-            POST("/comment/{commentId}/reply") {
+            POST("/{commentId}/reply") {
                 kafkaProxy {
                     requestTopic = "reply-create-request"
                     responseTopic = "reply-create-response"
@@ -40,7 +41,7 @@ fun commentRoutes(replyingKafkaTemplate: ReplyingKafkaTemplate<String, String, S
                     }
                 } ()
             }
-            PUT("/comment/{commentId}/reply/{replyId}") {
+            PUT("/{commentId}/reply/{replyId}") {
                 kafkaProxy {
                     requestTopic = "reply-edit-request"
                     responseTopic = "reply-edit-response"
@@ -50,10 +51,11 @@ fun commentRoutes(replyingKafkaTemplate: ReplyingKafkaTemplate<String, String, S
                             "commentId" to it.map("commentId").toString(),
                             "replyId" to it.map("replyId").toString()
                         )
+                        body = it.body()
                     }
                 } ()
             }
-            DELETE("/comment/{commentId}/reply/{replyId}") {
+            DELETE("/{commentId}/reply/{replyId}") {
                 kafkaProxy {
                     requestTopic = "reply-delete-request"
                     responseTopic = "reply-delete-response"

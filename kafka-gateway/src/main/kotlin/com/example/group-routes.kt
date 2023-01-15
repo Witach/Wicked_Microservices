@@ -1,6 +1,7 @@
 package com.example
 
 import com.example.servicechassis.KafkaObjectMapper
+import com.example.servicechassis.kafkaProxy
 import com.example.servicechassis.map
 import org.springframework.kafka.requestreply.ReplyingKafkaTemplate
 import org.springframework.web.servlet.function.RouterFunction
@@ -11,6 +12,19 @@ import org.springframework.web.servlet.function.router
 fun groupRoutes(replayingKafkaTemplate: ReplyingKafkaTemplate<String, String, String>, kafkaObjectMapper: KafkaObjectMapper): RouterFunction<ServerResponse> {
     return router {
         path("/group").nest {
+
+            GET("/post") {
+                kafkaProxy {
+                    requestTopic = "grouppost-getall-request"
+                    responseTopic = "grouppost-getall-response"
+                    kafkaTemplate = replayingKafkaTemplate
+                    post = kafkaObjectMapper.convertToMessageFrom {
+                        param = mapOf(
+                            "groupIds" to it.param("groupIds").orElse("")
+                        )
+                    }
+                } ()
+            }
             GET("") {
                 kafkaProxy {
                     requestTopic = "group-get-request"

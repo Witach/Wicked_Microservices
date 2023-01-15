@@ -1,6 +1,5 @@
 package com.example.applicationservice
 
-import com.example.GroupIds
 import com.example.GroupPostCreateProjection
 import com.example.PostProjection
 import com.example.entity.Attachment
@@ -9,7 +8,9 @@ import com.example.entity.GroupPost
 import com.example.event.GroupPostAddedEvent
 import com.example.event.GroupPostEditedEvent
 import com.example.event.GroupPostRemovedEvent
-import com.example.repository.*
+import com.example.repository.CommentRepository
+import com.example.repository.GroupPostRepository
+import com.example.repository.GroupRepository
 import org.example.EntityNotFoundException
 import org.example.EventPublisher
 import org.example.NoAuthenticationAvailableException

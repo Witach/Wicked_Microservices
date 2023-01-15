@@ -65,12 +65,12 @@ fun beanDefinitions(dsl: BeanDefinitionDsl) {
     dsl.bean {
         AuthServerClientImpl(ref(), ref())
     }
-    dsl.profile("prod") {
+    dsl.profile("prod & !kafka") {
         dsl.bean {
             SessionStorageImpl()
         }
     }
-    dsl.profile("dev") {
+    dsl.profile("dev & !kafka") {
         dsl.bean {
             SessionStorageMock()
         }
@@ -102,16 +102,16 @@ fun kafkaProducers(dsl: BeanDefinitionDsl) {
                 GROUP_ID_CONFIG to dsl.env["spring.application.name"],
             )
         }
-        dsl.bean {
+        dsl.bean("defaultKafkaConsumerFactory") {
             DefaultKafkaConsumerFactory<String, String>(ref("consumerConfig"))
         }
-        dsl.bean {
+        dsl.bean("concurrentKafkaListenerContainerFactory") {
             ConcurrentKafkaListenerContainerFactory<String, String>().apply {
-                consumerFactory = ref()
-                setReplyTemplate(ref())
+                consumerFactory = ref("defaultKafkaConsumerFactory")
+                setReplyTemplate(ref("kafkaTemplate"))
             }
         }
-        dsl.bean {
+        dsl.bean("defaultKafkaProducerFactory") {
             DefaultKafkaProducerFactory<String, String>(ref("producerConfig"))
         }
         dsl.bean("producerConfig") {
@@ -121,33 +121,36 @@ fun kafkaProducers(dsl: BeanDefinitionDsl) {
                 ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG to StringSerializer::class.java
             )
         }
-        dsl.bean(isPrimary = true) {
-            KafkaTemplate<String, String>(ref())
+        dsl.bean(isPrimary = true, name = "kafkaTemplate") {
+            KafkaTemplate<String, String>(ref("defaultKafkaProducerFactory"))
         }
-        dsl.bean<EventPublisherImpl>()
+        dsl.bean {
+            EventPublisherImpl(ref("kafkaTemplate"), ref())
+        }
     }
 }
 
 fun kafkaReplyingProducers(dsl: BeanDefinitionDsl) {
-    dsl.bean {
-        ReplyingKafkaTemplate<String, String, String>(ref(), ref())
+    dsl.bean("replyingKafkaTemplate") {
+        ReplyingKafkaTemplate<String, String, String>(ref("replyingKafkaProducerFactory"),
+            ref("replyingKafkaListenerContainer"))
     }
-    dsl.bean {
-        KafkaMessageListenerContainer<String, String>(ref(), ContainerProperties(*extractList(dsl.env,
+    dsl.bean("replyingKafkaListenerContainer") {
+        KafkaMessageListenerContainer<String, String>(ref("replyingKafkaConsumerFactory"), ContainerProperties(*extractList(dsl.env,
             "kafka.topics").toTypedArray())
         )
     }
-    dsl.bean {
-        DefaultKafkaProducerFactory<String, String>(ref("producerConfig"))
+    dsl.bean("replyingKafkaProducerFactory") {
+        DefaultKafkaProducerFactory<String, String>(ref("replyingProducerConfig"))
     }
-    dsl.bean("producerConfig") {
+    dsl.bean("replyingProducerConfig") {
         mapOf(
             ProducerConfig.BOOTSTRAP_SERVERS_CONFIG to dsl.env["kafka.bootstrapServer"],
             ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG to StringSerializer::class.java,
             ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG to StringSerializer::class.java
         )
     }
-    dsl.bean("consumerConfig") {
+    dsl.bean("replyingConsumerConfig") {
         mapOf(
             BOOTSTRAP_SERVERS_CONFIG to dsl.env["kafka.bootstrapServer"],
             KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
@@ -155,8 +158,56 @@ fun kafkaReplyingProducers(dsl: BeanDefinitionDsl) {
             GROUP_ID_CONFIG to dsl.env["spring.application.name"],
         )
     }
-    dsl.bean {
-        DefaultKafkaConsumerFactory<String, String>(ref("consumerConfig"))
+    dsl.bean("replyingKafkaConsumerFactory") {
+        DefaultKafkaConsumerFactory<String, String>(ref("replyingConsumerConfig"))
+    }
+}
+
+fun bothKafka(dsl: BeanDefinitionDsl) {
+    dsl.profile("kafka") {
+
+        dsl.bean("consumerConfig") {
+            mapOf(
+                BOOTSTRAP_SERVERS_CONFIG to dsl.env["kafka.bootstrapServer"],
+                KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
+                VALUE_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
+                GROUP_ID_CONFIG to dsl.env["spring.application.name"],
+            )
+        }
+        dsl.bean("defaultKafkaConsumerFactory") {
+            DefaultKafkaConsumerFactory<String, String>(ref("consumerConfig"))
+        }
+        dsl.bean("concurrentKafkaListenerContainerFactory") {
+            ConcurrentKafkaListenerContainerFactory<String, String>().apply {
+                consumerFactory = ref("defaultKafkaConsumerFactory")
+                setReplyTemplate(ref("kafkaTemplate"))
+            }
+        }
+        dsl.bean("defaultKafkaProducerFactory") {
+            DefaultKafkaProducerFactory<String, String>(ref("producerConfig"))
+        }
+        dsl.bean("producerConfig") {
+            mapOf(
+                ProducerConfig.BOOTSTRAP_SERVERS_CONFIG to dsl.env["kafka.bootstrapServer"],
+                ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG to StringSerializer::class.java,
+                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG to StringSerializer::class.java
+            )
+        }
+        dsl.bean(isPrimary = true, name = "kafkaTemplate") {
+            KafkaTemplate<String, String>(ref("defaultKafkaProducerFactory"))
+        }
+        dsl.bean {
+            EventPublisherImpl(ref("kafkaTemplate"), ref())
+        }
+        dsl.bean("replyingKafkaTemplate") {
+            ReplyingKafkaTemplate<String, String, String>(ref("defaultKafkaProducerFactory"),
+                ref("replyingKafkaListenerContainer"))
+        }
+        dsl.bean("replyingKafkaListenerContainer") {
+            KafkaMessageListenerContainer<String, String>(ref("defaultKafkaConsumerFactory"), ContainerProperties(*extractList(dsl.env,
+                "kafka.topics").toTypedArray())
+            )
+        }
     }
 }
 

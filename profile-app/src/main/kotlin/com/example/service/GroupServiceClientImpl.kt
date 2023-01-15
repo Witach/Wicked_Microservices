@@ -1,6 +1,9 @@
 package com.example.service
 
 import com.example.servicechassis.KafkaClient
+import com.example.servicechassis.KafkaObjectMapper
+import com.example.servicechassis.kafkaProxy
+import com.example.servicechassis.kafkaProxyFeign
 import org.apache.kafka.clients.consumer.ConsumerRecords
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.clients.consumer.OffsetAndTimestamp
@@ -8,6 +11,7 @@ import org.apache.kafka.common.TopicPartition
 import org.springframework.context.annotation.Profile
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory
 import org.springframework.kafka.core.KafkaTemplate
+import org.springframework.kafka.requestreply.ReplyingKafkaTemplate
 import org.springframework.stereotype.Component
 import java.sql.Timestamp
 import java.time.Instant
@@ -24,11 +28,15 @@ class GroupServiceClientImpl(val groupServiceFeignClient: GroupServiceFeignClien
 
 @Component
 @Profile("kafka")
-class GroupServiceClientImplKafka(val kafkaClient: KafkaClient): GroupServiceClient {
+class GroupServiceClientImplKafka(val kafkaClient: ReplyingKafkaTemplate<String, String, String>, val kafkaObjectMapper: KafkaObjectMapper): GroupServiceClient {
     override fun existsById(group: UUID): Boolean {
-        val key = UUID.randomUUID().toString()
-        kafkaClient.send("group-exists-response", key, mapOf("groupId" to group.toString()))
-        return kafkaClient.receiveSyncResp("group-exists-response", key)!!["groupExists"]!!.toBoolean()
+        val response = kafkaProxyFeign {
+            kafkaTemplate = kafkaClient
+            requestTopic = "group-exists-request"
+            responseTopic = "group-exists-response"
+            post = kafkaObjectMapper.convertToMessageFromPathVariable("groupId" to group.toString())
+        }()
+        return response == "true"
     }
 }
 

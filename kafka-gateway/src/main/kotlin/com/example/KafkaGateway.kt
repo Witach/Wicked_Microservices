@@ -21,6 +21,11 @@ fun main(args: Array<String>) {
     runApplication<KafkaGateway>(*args) {
         addInitializers(
             beans {
+                profile("kafka") {
+                    bean {
+                        SessionStorageImpl()
+                    }
+                }
                 bean<KafkaObjectMapper>()
                 beanDefinitions(this)
                 kafkaReplyingProducers(this)
@@ -32,6 +37,8 @@ fun main(args: Array<String>) {
                         .and(commentRoutes(ref(), ref()))
                         .and(groupPostRoutes(ref(), ref()))
                         .and(postRoutes(ref(), ref()))
+                        .and(profileRoutes(ref(), ref()))
+                        .and(feedRoutes(ref(), ref()))
                 }
                 bean {
                     router {

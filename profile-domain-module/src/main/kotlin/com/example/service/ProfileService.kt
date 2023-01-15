@@ -25,7 +25,6 @@ class ProfileService(
 
     fun addToGroup(profileId: UUID, groupUUID: UUID) {
 
-        throwIfNoSuchGroupd(groupUUID)
 
         profileRepository.findById(profileId)?.also {
             sessionStorage.throwIfNoPermission(it.userId)
@@ -36,8 +35,6 @@ class ProfileService(
     }
 
     fun removeFromGroup(profileId: UUID, groupUUID: UUID) {
-
-        throwIfNoSuchGroupd(groupUUID)
 
         profileRepository.findById(profileId)?.also {
             sessionStorage.throwIfNoPermission(it.userId)

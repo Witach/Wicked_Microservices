@@ -6,67 +6,158 @@ import com.example.ProfileProjectionWithFollow
 import com.example.UserEditProjection
 import com.example.service.ProfileService
 import com.example.service.UserService
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.example.servicechassis.*
+import org.example.EntityNotFoundException
 import org.springframework.kafka.annotation.KafkaListener
-import org.springframework.stereotype.Service
+import org.springframework.messaging.handler.annotation.SendTo
 import java.util.*
 
-class Listeners(val objectMapper: ObjectMapper,
+class Listeners(val kafkaObjectMapper: KafkaObjectMapper,
+                val imperativeSessionStorage: ImperativeSessionStorage,
                 val profileService: ProfileService,
                 val userService: UserService) {
 
-    @KafkaListener(topics = ["profile-update-message"], groupId = "profile-update-message-consumer")
-    fun `profile-update-message`(content: String) {
-        val map = objectMapper.readValue(content, Map::class.java)
-        profileService.editProfile(UUID.fromString(map["profileId"] as String),
-            objectMapper.readValue(map["profile"] as String, ProfileEditProjection::class.java))
+    @KafkaListener(topics = ["profile-update-request"])
+    @SendTo("profile-update-response")
+    fun `profile-update-message`(content: String): String {
+        imperativeSessionStorage.userId = kafkaObjectMapper.readSession(content)
+        val map = kafkaObjectMapper.readPathVariable(content, "profileId") ?: return FAILURE
+        val body = kafkaObjectMapper.readBody(content, ProfileEditProjection::class.java)
+        return try {
+            profileService.editProfile(map, body)
+            SUCCESS
+        } catch (e: EntityNotFoundException) {
+            FAILURE
+        }
     }
 
-    @KafkaListener(topics = ["profile-addtogroup-message"], groupId = "profile-addtogroup-message-consumer")
-    fun `profile-addtogroup-message`(content: String) {
-        val map = objectMapper.readValue(content, Map::class.java)
-        profileService.addToGroup(UUID.fromString(map["profileId"] as String),
-            UUID.fromString(map["groupId"] as String))
+    @KafkaListener(topics = ["profile-addtogroup-request"])
+    @SendTo("profile-addtogroup-response")
+    fun `profile-addtogroup-message`(content: String): String {
+        imperativeSessionStorage.userId = kafkaObjectMapper.readSession(content)
+        val map = kafkaObjectMapper.readPathVariable(content, "profileId") ?: return FAILURE
+        val group = kafkaObjectMapper.readParameterUUID(content, "groupId") ?: return FAILURE
+        return tryToResponse {
+            profileService.addToGroup(map, group)
+            SUCCESS
+        }
     }
 
-    @KafkaListener(topics = ["profile-removefromgroup-message"], groupId = "profile-removefromgroup-message-consumer")
-    fun `profile-removefromgroup-message`(content: String) {
-        val map = objectMapper.readValue(content, Map::class.java)
-        profileService.removeFromGroup(UUID.fromString(map["profileId"] as String),
-            UUID.fromString(map["groupId"] as String))
+    @KafkaListener(topics = ["profile-removefromgroup-request"])
+    @SendTo("profile-removefromgroup-response")
+    fun `profile-removefromgroup-message`(content: String): String {
+        imperativeSessionStorage.userId = kafkaObjectMapper.readSession(content)
+        val map = kafkaObjectMapper.readPathVariable(content, "profileId") ?: return FAILURE
+        val group = kafkaObjectMapper.readParameterUUID(content, "groupId") ?: return FAILURE
+        return tryToResponse {
+            profileService.removeFromGroup(map, group)
+            SUCCESS
+        }
+
     }
 
-    @KafkaListener(topics = ["profile-starttofollow-message"], groupId = "profile-starttofollow-message-consumer")
-    fun `profile-starttofollow-message`(content: String) {
-        val map = objectMapper.readValue(content, Map::class.java)
-        profileService.startToFollow(UUID.fromString(map["profileId"] as String),
-            ProfileProjectionWithFollow(UUID.fromString(map["profileToFollow"] as String)) )
+    @KafkaListener(topics = ["profile-starttofollow-request"])
+    @SendTo("profile-starttofollow-response")
+    fun `profile-starttofollow-message`(content: String): String {
+        imperativeSessionStorage.userId = kafkaObjectMapper.readSession(content)
+        val map = kafkaObjectMapper.readPathVariable(content, "profileId") ?: return FAILURE
+        val body = kafkaObjectMapper.readBody(content, ProfileProjectionWithFollow::class.java)
+        return tryToResponse {
+            profileService.startToFollow(map, body)
+            SUCCESS
+        }
     }
 
-    @KafkaListener(topics = ["profile-stoptofollow-message"], groupId = "profile-stoptofollow-message-consumer")
-    fun `profile-stoptofollow-message`(content: String) {
-        val map = objectMapper.readValue(content, Map::class.java)
-        profileService.removeFollowedProfile(UUID.fromString(map["profileId"] as String),
-            UUID.fromString(map["profileToFollow"] as String))
+    @KafkaListener(topics = ["profile-stoptofollow-request"])
+    @SendTo("profile-stoptofollow-response")
+    fun `profile-stoptofollow-message`(content: String): String {
+        imperativeSessionStorage.userId = kafkaObjectMapper.readSession(content)
+        val map = kafkaObjectMapper.readPathVariable(content, "profileId") ?: return FAILURE
+        val body = kafkaObjectMapper.readParameterUUID(content, "profileToFollow") ?: return FAILURE
+        return tryToResponse {
+            profileService.removeFollowedProfile(map, body)
+            SUCCESS
+        }
     }
 
-    @KafkaListener(topics = ["user-creat-message"], groupId = "user-creat-message-consumer")
-    fun `user-creat-message`(content: String) {
-        val map = objectMapper.readValue(content, Map::class.java)
-        userService.registerNewUser(objectMapper.readValue(map["user"] as String, CreateUserProjection::class.java))
+    @KafkaListener(topics = ["user-creat-request"])
+    @SendTo("user-creat-response")
+    fun `user-creat-message`(content: String): String {
+        imperativeSessionStorage.userId = kafkaObjectMapper.readSession(content)
+        val body = kafkaObjectMapper.readBody(content, CreateUserProjection::class.java)
+        return tryToResponse {
+            userService.registerNewUser(body)
+            SUCCESS
+        }
     }
 
-    @KafkaListener(topics = ["user-delete-message"], groupId = "user-delete-message-consumer")
-    fun `user-delete-message`(content: String) {
-        val map = objectMapper.readValue(content, Map::class.java)
-        userService.removeUser(UUID.fromString(map["userId"] as String))
+    @KafkaListener(topics = ["user-delete-request"])
+    @SendTo("user-delete-response")
+    fun `user-delete-message`(content: String): String {
+        imperativeSessionStorage.userId = kafkaObjectMapper.readSession(content)
+        val map = kafkaObjectMapper.readPathVariable(content, "userId") ?: return FAILURE
+        return tryToResponse {
+            userService.removeUser(map)
+            SUCCESS
+        }
     }
 
-    @KafkaListener(topics = ["user-update-message"], groupId = "user-update-message-consumer")
-    fun `user-update-message`(content: String) {
-        val map = objectMapper.readValue(content, Map::class.java)
-        userService.editUser(UUID.fromString(map["userId"] as String),
-            objectMapper.readValue(map["user"] as String, UserEditProjection::class.java))
+    @KafkaListener(topics = ["user-update-request"])
+    @SendTo("user-update-response")
+    fun `user-update-message`(content: String): String {
+        imperativeSessionStorage.userId = kafkaObjectMapper.readSession(content)
+        val map = kafkaObjectMapper.readPathVariable(content, "userId") ?: return FAILURE
+        val body = kafkaObjectMapper.readBody(content, UserEditProjection::class.java)
+        return tryToResponse {
+            userService.editUser(map, body)
+            SUCCESS
+        }
     }
 
+    @KafkaListener(topics = ["profile-getall-request"])
+    @SendTo("profile-getall-response")
+    fun `profile-getall-request`(content: String): String {
+        imperativeSessionStorage.userId = kafkaObjectMapper.readSession(content)
+        return tryToResponse {
+            kafkaObjectMapper.convertToMessageFromBodyObject(
+                profileService.fetchAllProfiles()
+            )
+        }
+    }
+
+    @KafkaListener(topics = ["profile-get-request"])
+    @SendTo("profile-get-response")
+    fun `profile-get-request`(content: String): String {
+        imperativeSessionStorage.userId = kafkaObjectMapper.readSession(content)
+        val map = kafkaObjectMapper.readPathVariable(content, "profileId") ?: return FAILURE
+        return tryToResponse {
+            kafkaObjectMapper.convertToMessageFromBodyObject(
+                profileService.fetchUserProfile(map)
+            )
+        }
+    }
+
+    @KafkaListener(topics = ["user-get-request"])
+    @SendTo("user-get-response")
+    fun `user-get-request`(content: String): String {
+        imperativeSessionStorage.userId = kafkaObjectMapper.readSession(content)
+        val map = kafkaObjectMapper.readPathVariable(content, "userId") ?: return FAILURE
+        return tryToResponse {
+            kafkaObjectMapper.convertToMessageFromBodyObject(
+                userService.getUser(map)
+            )
+        }
+    }
+
+    @KafkaListener(topics = ["user-getall-request"])
+    @SendTo("user-getall-response")
+    fun `user-getall-request`(content: String): String {
+        imperativeSessionStorage.userId = kafkaObjectMapper.readSession(content)
+        return tryToResponse {
+            kafkaObjectMapper.convertToMessageFromBodyObject(
+                userService.getAllUsers()
+            )
+        }
+    }
 }
+

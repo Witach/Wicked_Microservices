@@ -30,6 +30,11 @@ fun main(args: Array<String>) {
     runApplication<PostApp>(*args) {
         addInitializers(
             beans {
+                profile("kafka") {
+                    bean {
+                        ImperativeSessionStorage()
+                    }
+                }
                 kafkaProducers(this)
                 bean<CommentService>()
                 bean<PostService>()

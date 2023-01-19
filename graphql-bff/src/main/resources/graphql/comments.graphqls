@@ -1,0 +1,38 @@
+scalar DateTime
+scalar UUID
+
+type Mutations {
+    addComment(input: CommentCreateProjection): UUID
+    addReply(input: ReplyCreateProjection): UUID
+    editReply(input: ReplyEdtProjection): UUID
+    deleteReply(input: UUID!): UUID
+    deleteComment(input: UUID!): UUID
+}
+
+type CommentProjection {
+    commentId: UUID!
+    authorId: UUID
+    text: String
+    sentTime: DateTime
+    replies: [ReplyProjection]
+}
+
+input ReplyCreateProjection {
+    text: String
+}
+
+input ReplyEdtProjection {
+    replyId: UUID!
+    text: String
+}
+
+type ReplyProjection {
+    replyId: UUID!
+    text: String
+    order: DateTime
+}
+
+input CommentCreateProjection {
+    postId: UUID!
+    text: String!
+}

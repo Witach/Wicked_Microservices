@@ -7,7 +7,7 @@ import org.springframework.stereotype.Controller
 import java.util.*
 
 @Controller
-class CommentResolver(val commentService: CommentService) {
+class CommentResolver(val commentService: PostAppService) {
 
     @MutationMapping
     fun addComment(@Argument input: CommentCreateProjection, context: GraphQLContext): UUID? {

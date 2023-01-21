@@ -13,6 +13,17 @@ import org.springframework.web.servlet.function.router
 fun routes(profileService: ProfileService, userService: UserService): RouterFunction<ServerResponse>{
     return router {
         path("profile").nest {
+            GET("/all") {
+                ok().body(profileService.fetchAllProfiles(
+                    it.param("profiles")
+                        .map {
+                            it.split(",")
+                                .map { it.toUUID() }
+                                .toSet()
+                        }.orElse(null)
+
+                ))
+            }
             GET("/{profileId}") {
                 ok().body(profileService.fetchUserProfile(it.map("profileId")))
             }

@@ -1,0 +1,24 @@
+extend type Query {
+    fetchAllProfiles: [ProfileProjection]!
+    fetchProfile(profileId: UUID!): ProfileProjection
+}
+
+extend type Mutation {
+    updateProfile(profileId: UUID!, profile: ProfileEditProjection!): ProfileProjection!
+    followProfile(profileId: UUID!, profileToFollow: UUID): ProfileProjection!
+    unfollowProfile(profileId: UUID!, profileToUnfollow: UUID): ProfileProjection!
+    registerUser(user: CreateUserProjection!): Boolean
+}
+
+input ProfileEditProjection {
+    username: String
+    birthday: LocalDate
+    avatar: String
+}
+
+input CreateUserProjection {
+    username: String
+    birthday: LocalDate
+    email: String
+    password: String
+}

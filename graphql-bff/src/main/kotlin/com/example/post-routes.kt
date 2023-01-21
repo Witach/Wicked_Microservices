@@ -1,27 +1,35 @@
-//package com.example
-//
-//import com.example.servicechassis.KafkaObjectMapper
-//import com.example.servicechassis.kafkaProxy
-//import org.springframework.kafka.requestreply.ReplyingKafkaTemplate
-//import org.springframework.web.servlet.function.RouterFunction
-//import org.springframework.web.servlet.function.ServerResponse
-//import org.springframework.web.servlet.function.body
-//import org.springframework.web.servlet.function.router
-//
-//fun postRoutes(replyingKafakTemplate: ReplyingKafkaTemplate<String, String, String>, kafkaObjectMapper: KafkaObjectMapper): RouterFunction<ServerResponse> {
-//    return router {
-//        path("/post").nest {
-//            POST("") {
-//            }
-//            GET("") {
-//            }
-//            DELETE("{profileId}") {
-//            }
-//            PUT("{postId}") {
-//            }
-//            DELETE("/{postId}/attachment/{attachmentId}") {
-//            }
-//        }
-//    }
-//}
-//// kafka-console-consumer.sh --topic post-get-request --from-beginning --bootstrap-server localhost:9092
+package com.example
+
+import graphql.GraphQLContext
+import org.springframework.graphql.data.method.annotation.Argument
+import org.springframework.graphql.data.method.annotation.MutationMapping
+import org.springframework.stereotype.Controller
+import java.util.*
+
+
+@Controller
+class PostsResolver(val postAppService: PostAppService) {
+    @MutationMapping
+    fun createPost(@Argument input: PostCreatePorjection, graphQLContext: GraphQLContext): UUID? {
+        postAppService.addPost(input, graphQLContext.getOrDefault("Authorization", ""))
+        return null
+    }
+
+    @MutationMapping
+    fun deletePost(@Argument postId: UUID, graphQLContext: GraphQLContext): UUID? {
+        postAppService.deletePost(postId, graphQLContext.getOrDefault("Authorization", ""))
+        return null
+    }
+
+    @MutationMapping
+    fun updatePost(@Argument postId: UUID, @Argument input: UpdatePostProjection, graphQLContext: GraphQLContext): UUID? {
+        postAppService.editPost(postId, input,graphQLContext.getOrDefault("Authorization", ""))
+        return null
+    }
+
+    @MutationMapping
+    fun deleteAttachment(@Argument postId: UUID, @Argument attachmentId: UUID, graphQLContext: GraphQLContext): UUID? {
+        postAppService.deleteAttachment(postId, attachmentId, graphQLContext.getOrDefault("Authorization", ""))
+        return null
+    }
+}

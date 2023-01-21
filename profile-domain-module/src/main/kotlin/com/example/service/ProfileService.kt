@@ -74,6 +74,9 @@ class ProfileService(
     fun fetchAllProfiles(): Set<Profile> {
         return profileRepository.findAll()
     }
+    fun fetchAllProfiles(ids: Set<UUID>): Set<Profile> {
+        return profileRepository.findAllByIds(ids.toList()).toSet()
+    }
 
     fun throwIfNoSuchGroupd(groupUUID: UUID) {
         if(!groupServiceClient.existsById(groupUUID)) {

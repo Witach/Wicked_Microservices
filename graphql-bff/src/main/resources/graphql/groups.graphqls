@@ -1,0 +1,36 @@
+extend type Mutation {
+    createGroup(group: GroupCreateProjection): UUID
+    deleteGroup(id: UUID): Boolean
+    deleteMemberFromGroup(groupId: UUID, memberId: UUID): Boolean
+    addMemberToGroup(groupId: UUID, memberId: UUID): Boolean
+}
+
+extend type Query {
+    group(id: UUID): GroupProjection
+}
+
+type GroupProjection {
+    groupInt: UUID
+    name: String
+    description: String
+    image: String
+    owner: ProfileProjection
+    profiles: [ProfileProjection]
+    posts: [PostProjection]
+    administrators: [ProfileProjection]
+}
+
+type ProfileProjection {
+    profileID: UUID
+    username: String
+    birthday: LocalDate
+}
+
+
+input GroupCreateProjection {
+    groupInt: UUID
+    name: String
+    description: String
+    image: String
+    owner: UUID
+}

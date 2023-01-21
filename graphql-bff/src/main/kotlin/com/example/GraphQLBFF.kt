@@ -2,6 +2,8 @@ package com.example
 
 import com.example.servicechassis.*
 import graphql.scalars.ExtendedScalars
+import localDateScalar
+import localDateTimeScalar
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.runApplication
@@ -41,7 +43,8 @@ fun graphQlBeans(dsl: BeanDefinitionDsl) {
     dsl.bean {
         RuntimeWiringConfigurer {
             it.scalar(ExtendedScalars.UUID)
-            it.scalar(ExtendedScalars.DateTime)
+            it.scalar(localDateTimeScalar())
+            it.scalar(localDateScalar())
         }
     }
     dsl.bean {

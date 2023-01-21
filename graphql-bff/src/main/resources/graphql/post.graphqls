@@ -1,0 +1,55 @@
+extend type Query {
+    fetchGroupPost(groupId: UUID!): [PostProjection]
+}
+
+extend type Mutation {
+    addGroupPost(post: GroupPostCreateProjection!): UUID
+}
+
+type PostProjection {
+    postId: UUID
+    author: UUID
+    text: String
+    attachments: [AttachmentProjection]
+    sentTime: LocalDateTime
+    comments: [CommentProjection]
+}
+
+input GroupPostCreateProjection {
+    group: UUID
+    author: UUID
+    text: String
+    attachments: [AttachmentProjectionInput]
+    sentTime: LocalDateTime
+}
+
+input AttachmentProjectionInput {
+    attachmentId: UUID
+    resourceLink: String
+    type: String
+}
+
+type AttachmentProjection {
+    attachmentId: UUID
+    resourceLink: String
+    type: String
+}
+
+
+extend type Mutation {
+    createPost(input: PostCreatePorjection!): UUID
+    deletePost(postId: UUID!): UUID
+    updatePost(postId: UUID!, input: UpdatePostProjection!): UUID
+    deleteAttachment(postId: UUID!, attachmentId: UUID!): UUID
+}
+
+input PostCreatePorjection {
+    author: UUID
+    text: String
+    attachments: [AttachmentProjectionInput]
+    sentTime: LocalDateTime
+}
+
+input UpdatePostProjection {
+    text: String
+}

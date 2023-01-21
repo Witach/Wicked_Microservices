@@ -1,31 +1,22 @@
 package com.example
 
-import com.example.servicechassis.KafkaObjectMapper
-import com.example.servicechassis.kafkaProxy
-import org.springframework.kafka.requestreply.ReplyingKafkaTemplate
-import org.springframework.web.servlet.function.RouterFunction
-import org.springframework.web.servlet.function.ServerResponse
-import org.springframework.web.servlet.function.body
-import org.springframework.web.servlet.function.router
+import graphql.GraphQLContext
+import org.springframework.graphql.data.method.annotation.Argument
+import org.springframework.graphql.data.method.annotation.QueryMapping
+import org.springframework.stereotype.Controller
+import java.util.*
 
-//fun profileRoutes(replayingKafkaTemplate: ReplyingKafkaTemplate<String, String, String>, kafkaObjectMapper: KafkaObjectMapper): RouterFunction<ServerResponse> {
-//    return router {
-//        path("/profile").nest {
-//            PUT("{profileId}") {}
-//            POST("/{profileId}/group") {}
-//            DELETE("/{profileId}/group") {}
-//            POST("/{profileId}/follow") {}
-//            DELETE("/{profileId}/follow") {}
-//
-//            GET("") {}
-//            GET("/{profileId}") {}
-//        }
-//        path("/user").nest {
-//            POST("") {}
-//            DELETE("/{userId}") {}
-//            PUT("/{userId}") {}
-//            GET("/{userId}") {}
-//            GET("") {}
-//        }
-//    }
-//}
+@Controller
+class ProfileResolvers(val profileAppService: ProfileAppService) {
+
+    @QueryMapping
+    fun fetchProfile(@Argument profileId: UUID, graphQLContext: GraphQLContext): ProfileProjection {
+        return profileAppService.getProfile(profileId, graphQLContext.getOrDefault("Authorization", ""))
+    }
+
+    @QueryMapping
+    fun fetchAllProfiles(graphQLContext: GraphQLContext): List<ProfileProjection> {
+        return profileAppService.getProfile(graphQLContext.getOrDefault("Authorization", ""))
+    }
+
+}

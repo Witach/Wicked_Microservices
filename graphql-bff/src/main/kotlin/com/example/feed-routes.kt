@@ -1,29 +1,16 @@
-//package com.example
-//
-//import com.example.servicechassis.KafkaObjectMapper
-//import com.example.servicechassis.kafkaProxy
-//import org.springframework.kafka.requestreply.ReplyingKafkaTemplate
-//import org.springframework.web.servlet.function.RouterFunction
-//import org.springframework.web.servlet.function.ServerResponse
-//import org.springframework.web.servlet.function.router
-//
-//fun feedRoutes(replyingKafkaTemplate: ReplyingKafkaTemplate<String, String, String>, kafkaObjectMapper: KafkaObjectMapper): RouterFunction<ServerResponse> {
-//    return router {
-//        path("/feed/").nest {
-//            path("group").nest {
-//                GET("/{groupId}") {
-//                }
-//                GET("/{groupId}/post") {
-//                }
-//            }
-//            path("/profile").nest {
-//                GET("/{profileId}") {
-//                }
-//                GET("/{profileId}/all") {
-//                }
-//            }
-//            GET("/{profileId}/all") {
-//            }
-//        }
-//    }
-//}
+package com.example
+
+import graphql.GraphQLContext
+import org.springframework.graphql.data.method.annotation.Argument
+import org.springframework.graphql.data.method.annotation.QueryMapping
+import org.springframework.stereotype.Controller
+import java.util.*
+
+
+@Controller
+class FeedResolvers(val feedAppService: FeedAppService) {
+    @QueryMapping
+    fun feed(@Argument profileId: UUID, graphQLContext: GraphQLContext): List<PostProjection> {
+        return feedAppService.getFeed(profileId, graphQLContext.getOrDefault("Authorization", ""))
+    }
+}

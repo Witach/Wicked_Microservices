@@ -1,4 +1,5 @@
-scalar DateTime
+scalar LocalDateTime
+scalar LocalDate
 scalar UUID
 
 type Mutation {
@@ -18,7 +19,7 @@ type CommentProjection {
     commentId: UUID!
     authorId: UUID
     text: String
-    sentTime: DateTime
+    sentTime: LocalDateTime
     replies: [ReplyProjection]
 }
 
@@ -34,7 +35,7 @@ input ReplyEdtProjection {
 type ReplyProjection {
     replyId: UUID!
     text: String
-    order: DateTime
+    order: LocalDateTime
 }
 
 input CommentCreateProjection {

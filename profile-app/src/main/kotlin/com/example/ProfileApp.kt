@@ -11,6 +11,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.runApplication
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.context.support.beans
+import org.springframework.web.servlet.function.router
 
 @EnableFeignClients
 @SpringBootApplication
@@ -23,6 +24,12 @@ fun main(args: Array<String>) {
             beans {
                 beanDefinitions(this)
                 bothKafka(this)
+                profile("dev & feign") {
+                    bean<EventPublisherMock>()
+                    bean {
+
+                    }
+                }
                 bean {
                     ProfileService(ref(), ref(), ref(), ref())
                 }
@@ -39,7 +46,14 @@ fun main(args: Array<String>) {
                 }
                 profile("feign") {
                     bean {
-                        routes(ref(), ref())
+                        routes(ref(), ref()).and(
+                            router {
+                                GET("/events") { req ->
+                                    val events = ref<EventPublisherMock>().listMap
+                                    ok().body(events)
+                                }
+                            }
+                        )
                     }
                 }
                 profile("kafka") {

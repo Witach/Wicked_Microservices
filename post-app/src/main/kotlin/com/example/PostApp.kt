@@ -36,6 +36,7 @@ fun main(args: Array<String>) {
                     }
                 }
                 kafkaProducers(this)
+
                 bean<CommentService>()
                 bean<PostService>()
                 bean {

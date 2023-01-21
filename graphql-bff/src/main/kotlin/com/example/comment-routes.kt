@@ -1,27 +1,42 @@
 package com.example
 
-import com.example.servicechassis.KafkaObjectMapper
-import com.example.servicechassis.kafkaProxy
-import com.example.servicechassis.map
-import org.springframework.kafka.requestreply.ReplyingKafkaTemplate
-import org.springframework.web.servlet.function.RouterFunction
-import org.springframework.web.servlet.function.ServerResponse
-import org.springframework.web.servlet.function.body
-import org.springframework.web.servlet.function.router
+import graphql.GraphQLContext
+import org.springframework.graphql.data.method.annotation.Argument
+import org.springframework.graphql.data.method.annotation.MutationMapping
+import org.springframework.stereotype.Controller
+import java.util.*
 
-fun commentRoutes(replyingKafkaTemplate: ReplyingKafkaTemplate<String, String, String>, kafkaObjectMapper: KafkaObjectMapper): RouterFunction<ServerResponse> {
-    return router {
-        path("/comment").nest {
-            POST("") {
-            }
-            DELETE("{profileId}") {
-            }
-            POST("/{commentId}/reply") {
-            }
-            PUT("/{commentId}/reply/{replyId}") {
-            }
-            DELETE("/{commentId}/reply/{replyId}") {
-            }
-        }
+@Controller
+class CommentResolver(val commentService: CommentService) {
+
+    @MutationMapping
+    fun addComment(@Argument input: CommentCreateProjection, context: GraphQLContext): UUID? {
+        commentService.addComment(input,  context.getOrDefault("Authorization", ""))
+        return null
     }
+
+    @MutationMapping
+    fun addReply(@Argument commentId: UUID, @Argument input: ReplyCreateProjection, context: GraphQLContext): UUID? {
+        commentService.addReply(input, commentId, context.getOrDefault("Authorization", ""))
+        return null
+    }
+
+    @MutationMapping
+    fun editReply(@Argument commentId: UUID, @Argument input: ReplyEdtProjection, context: GraphQLContext): UUID? {
+        commentService.editReply(input, commentId, context.getOrDefault("Authorization", ""))
+        return null
+    }
+
+    @MutationMapping
+    fun deleteComment(@Argument commentId: UUID, context: GraphQLContext): UUID? {
+        commentService.deleteComment(commentId, context.getOrDefault("Authorization", ""))
+        return null
+    }
+
+    @MutationMapping
+    fun deleteReply(@Argument commentId: UUID, @Argument replyId: UUID, context: GraphQLContext): UUID? {
+        commentService.deleteReply(commentId, replyId, context.getOrDefault("Authorization", ""))
+        return null
+    }
+
 }

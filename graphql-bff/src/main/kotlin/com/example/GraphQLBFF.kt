@@ -24,17 +24,17 @@ fun main(args: Array<String>) {
             beans {
                 beanDefinitions(this)
                 beansInit(this)
+                graphQlBeans(this)
+                bean {
+                    filterChain(ref(), ::devRestrictions)
+                }
             }
 
         )
     }
 }
-
-
 fun beansInit(dsl: BeanDefinitionDsl) {
-    dsl.bean() {
-        routes(dsl)
-    }
+//    dsl.bean<CommentResolver>()
 }
 
 fun graphQlBeans(dsl: BeanDefinitionDsl) {
@@ -43,6 +43,15 @@ fun graphQlBeans(dsl: BeanDefinitionDsl) {
             it.scalar(ExtendedScalars.UUID)
             it.scalar(ExtendedScalars.DateTime)
         }
+    }
+    dsl.bean {
+        commentResolvers(dsl)
+    }
+}
+
+fun commentResolvers(dsl: BeanDefinitionDsl) {
+    dsl.bean {
+
     }
 }
 

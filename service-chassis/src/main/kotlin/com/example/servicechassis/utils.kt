@@ -79,10 +79,8 @@ fun beanDefinitions(dsl: BeanDefinitionDsl) {
 }
 
 fun kafkaProducers(dsl: BeanDefinitionDsl) {
-    dsl.profile("!kafka") {
-        dsl.bean {
-            dsl.bean<EventPublisherMock>()
-        }
+    dsl.profile("dev & feign") {
+        dsl.bean<EventPublisherMock>()
         dsl.bean {
             router {
                 GET("/events") { req ->

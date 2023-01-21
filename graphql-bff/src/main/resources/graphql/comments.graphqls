@@ -1,12 +1,17 @@
 scalar DateTime
 scalar UUID
 
-type Mutations {
+type Mutation {
     addComment(input: CommentCreateProjection): UUID
-    addReply(input: ReplyCreateProjection): UUID
-    editReply(input: ReplyEdtProjection): UUID
-    deleteReply(input: UUID!): UUID
-    deleteComment(input: UUID!): UUID
+    addReply(commentId: UUID, input: ReplyCreateProjection): UUID
+    editReply(commentId: UUID, input: ReplyEdtProjection): UUID
+    deleteReply(commentId: UUID!, replyId: UUID!): UUID
+    deleteComment(commentId: UUID): UUID
+}
+
+type Query {
+    getComments(input: UUID!): [CommentProjection]
+    getReplies(input: UUID!): [ReplyProjection]
 }
 
 type CommentProjection {

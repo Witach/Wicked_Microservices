@@ -14,6 +14,7 @@ repositories {
 dependencies {
     implementation("com.graphql-java:graphql-java-extended-scalars:20.0")
     implementation("org.springframework.boot:spring-boot-starter-graphql")
+    implementation(project(":projection-lib"))
     testImplementation("org.springframework.graphql:spring-graphql-test")
     implementation(project(":service-chassis"))
     implementation(project(":DDD"))

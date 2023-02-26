@@ -71,6 +71,11 @@ fun main(args: Array<String>) {
                         }
                     }
                 }
+                profile("grpc") {
+                    bean {
+                        GRPCSessionStorage()
+                    }
+                }
                 profile("kafka") {
                     bean<CommentListener>()
                     bean<GroupPostListener>()

@@ -18,10 +18,20 @@ fun main(args: Array<String>) {
     runApplication<FeedApp>(*args) {
         addInitializers (
             beans {
+                profile("grpc") {
+                    bean {
+                        SessionStorageImpl()
+                    }
+                }
                 beanDefinitions(this)
                 profile("feign") {
                     bean {
-                        routes(ref(), ref(), ref())
+                        routes(ref(), ref())
+                    }
+                }
+                profile("grpc") {
+                    bean {
+                        routes(ref(), ref())
                     }
                 }
                 profile("dev") {

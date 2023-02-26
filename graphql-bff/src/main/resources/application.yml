@@ -12,7 +12,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8085/auth/realms/SocialApp
+          issuer-uri: http://key-cloak:8085/auth/realms/SocialApp
 
 eureka:
   client:

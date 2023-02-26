@@ -1,0 +1,102 @@
+syntax = "proto3";
+
+package com.example;
+
+option java_multiple_files = true;
+option java_package = "com.examples.lib";
+option java_outer_classname = "PostServiceProto";
+
+service  GroupService {
+  rpc loadGroup (LoadGroupMessage) returns (LoadGroupResponse);
+  rpc loadGroupPosts (LoadGroupPostsMessage) returns (LoadGroupPostsResponse);
+  rpc loadPosts (LoadPostsMessage) returns (LoadPostsResponse);
+  rpc loadPostsWitGroupPosts (LoadPostsWithGroupPostsMessage) returns (LoadPostsWithGroupPostsResponse);
+  rpc existsById (ExistsByIdMessage) returns (ExistsByIdResponse) {}
+}
+
+message LoadPostsWithGroupPostsResponse {
+  repeated PostProto posts = 1;
+}
+
+message LoadPostsWithGroupPostsMessage {
+  string session = 1;
+  repeated string profiles = 2;
+  repeated string groups = 3;
+  int32 size = 4;
+  int32 page = 5;
+}
+
+message LoadPostsMessage {
+  string session = 1;
+  repeated string profiles = 2;
+  repeated string groups = 3;
+  int32 page = 4;
+  int32 size = 5;
+}
+
+message LoadPostsResponse {
+  repeated PostProto posts = 1;
+}
+
+message LoadGroupMessage {
+  string session = 1;
+  string groupId = 2;
+}
+
+message LoadGroupResponse {
+  string groupInt = 1;
+  string name = 2;
+  string description = 3;
+  string image = 4;
+  string owner = 5;
+  repeated string profiles = 6;
+  repeated PostProto posts = 7;
+  repeated string administrators = 8;
+}
+
+message LoadGroupPostsResponse {
+  repeated PostProto posts = 1;
+}
+
+message PostProto {
+  string postId = 1;
+  string author = 2;
+  string text = 3;
+  repeated AttachmentProto attachments = 4;
+  string sentTime = 5;
+  repeated CommentProto comments = 6;
+}
+
+message CommentProto {
+  string commentId = 1;
+  string authorId = 2;
+  string text = 3;
+  string sentTime = 4;
+  repeated ReplyProto replies = 5;
+}
+
+message ReplyProto {
+  string replyId = 1;
+  string text = 2;
+  string order = 3;
+}
+
+message AttachmentProto {
+  string attachmentId = 1;
+  string resourceLink = 2;
+  string type = 3;
+}
+
+message LoadGroupPostsMessage {
+  string session = 1;
+  string groupId = 2;
+}
+
+message ExistsByIdMessage {
+  string session = 1;
+  string groupId = 2;
+}
+
+message ExistsByIdResponse {
+  bool exists = 1;
+}

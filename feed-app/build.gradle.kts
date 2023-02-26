@@ -12,6 +12,8 @@ repositories {
 dependencies {
     implementation(project(":service-chassis"))
     implementation(project(":feed-domain-module"))
+    implementation("net.devh:grpc-client-spring-boot-starter:2.12.0.RELEASE")
+    implementation(files("/home/dawid/Documents/projects/SocialApp/grpc-interface/build/libs/grpc-interface-0.0.1-SNAPSHOT.jar"))
 }
 
 configurations.all {

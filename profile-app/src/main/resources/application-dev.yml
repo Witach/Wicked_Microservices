@@ -1,9 +1,17 @@
-
 spring:
   config:
     import: "optional:configserver:"
   application:
-    name: feed-app
+    name: profile-app
+  data:
+    mongodb:
+      host: localhost
+      database: SocialApp
+      password: example
+      username: root
+      port: 27017
+      authentication-database: admin
+      uuid-representation: standard
   cloud:
     config:
       discovery:
@@ -13,13 +21,12 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://key-cloak:8085/auth/realms/SocialApp
+          issuer-uri: http://localhost:8085/auth/realms/SocialApp
 
 eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka/
-
 
 auth-server:
   client-id: admin-cli
@@ -29,23 +36,21 @@ auth-server:
   authCode: eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICIyb3h1enU2U0lPRHpDN0hCUGh6N2FtTzdORlBPcDFPS0FvU3gzVUEtVTd3In0.eyJleHAiOjE2NzM0MjIyNjYsImlhdCI6MTY3MzM4NjI2NiwianRpIjoiMmE1ZmRlNjQtOWUzNy00ZmNlLTk5NzgtYWUxNGI1ZjM0MTMwIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDg1L2F1dGgvcmVhbG1zL1NvY2lhbEFwcCIsInN1YiI6ImU4Yjc5ZTg5LTQ4NDktNGQ1OS05ZDU1LWRlYmRkZTllYzg2MiIsInR5cCI6IkJlYXJlciIsImF6cCI6ImFkbWluLWNsaSIsInNlc3Npb25fc3RhdGUiOiJkYTg1Mjg4ZS00MjQ1LTQyMDEtOTJlYS02OWE4MzQ3YmZiOGUiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbIioiXSwic2NvcGUiOiJlbWFpbCBwcm9maWxlIiwic2lkIjoiZGE4NTI4OGUtNDI0NS00MjAxLTkyZWEtNjlhODM0N2JmYjhlIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInByZWZlcnJlZF91c2VybmFtZSI6IndpdGFzemVrOThAd3AucGwifQ.kJi2ZRl4W__hg5k1BRHofwsilhujl19V4zvHN9Br0fOLRYHmaTYK6thKH97IhI9G4pjU_XUnjo3q_H2SfxsH3at83dOio2Na0VQTcv80Fe3LVxkg2AtD_vj46z59HDsFWBTonAb6TIbIAGyj86xlyHG2ClfTVxRiMBSN4d94ZxXDyyKdOh_oN0s3zHnFslzipJbgJsuBhjyfeltn9T4hTu4aPprsX-ULR7GjAha7BElPhtS2oZVm4P7WHTkfsYF9ZCS-53AwArwUXmMHjJYuxWZQZ_mw22aJ6MUXHM_l-uOQvric2p5umNpl9YZOw12SsqMft3geJCcyYQ-LR0vKbw
   host: http://localhost:8085/
 
-
 kafka:
   bootstrapServer: localhost:9092
   topics:
-    - profile-get-response
-    - post-getall-response
-    - group-get-response
-server:
-  port: 8088
+    - group-exists-response
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include": '*'
 
 grpc:
   client:
     postService:
       address: "discovery:///post-app"
       negotiation-type: plaintext
-    profileService:
-      address: "discovery:///profile-app"
-      negotiation-type: plaintext
   server:
-    port: 9093
+    port: 9999

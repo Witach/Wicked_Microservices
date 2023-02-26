@@ -1,16 +1,14 @@
 package com.example.configuration
 
-import com.example.service.GroupServiceClientImpl
-import com.example.service.PostServiceClientImpl
-import com.example.service.ProfileServiceClientImpl
+import com.example.domainservice.GroupServiceClient
+import com.example.domainservice.PostServiceClient
 import com.example.servicechassis.toUUID
 import org.springframework.web.servlet.function.RouterFunction
 import org.springframework.web.servlet.function.ServerResponse
 import org.springframework.web.servlet.function.router
 
-fun routes(groupServiceClientImpl: GroupServiceClientImpl,
-           postServiceClientImpl: PostServiceClientImpl,
-           profileServiceClientImpl: ProfileServiceClientImpl): RouterFunction<ServerResponse> {
+fun routes(groupServiceClientImpl: GroupServiceClient,
+           postServiceClientImpl: PostServiceClient): RouterFunction<ServerResponse> {
     return router {
         path("/feed/group").nest {
             GET("/{groupId}") {

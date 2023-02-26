@@ -70,7 +70,7 @@ fun beanDefinitions(dsl: BeanDefinitionDsl) {
             SessionStorageImpl()
         }
     }
-    dsl.profile("dev & !kafka") {
+    dsl.profile("dev & feign") {
         dsl.bean {
             SessionStorageMock()
         }
@@ -80,6 +80,17 @@ fun beanDefinitions(dsl: BeanDefinitionDsl) {
 
 fun kafkaProducers(dsl: BeanDefinitionDsl) {
     dsl.profile("dev & feign") {
+        dsl.bean<EventPublisherMock>()
+        dsl.bean {
+            router {
+                GET("/events") { req ->
+                    val events = ref<EventPublisherMock>().listMap
+                    ok().body(events)
+                }
+            }
+        }
+    }
+    dsl.profile("dev & grpc") {
         dsl.bean<EventPublisherMock>()
         dsl.bean {
             router {

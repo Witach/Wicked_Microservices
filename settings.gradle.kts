@@ -1,6 +1,5 @@
 rootProject.name = "SocialApp"
 
-
 pluginManagement {
     repositories {
         gradlePluginPortal()
@@ -31,3 +30,4 @@ include("service-chassis")
 include("kafka-gateway")
 include("kafka-gateway")
 include("graphql-bff")
+include("grpc-interface")

@@ -1,0 +1,144 @@
+version: '3.5'
+
+services:
+
+  post-app:
+    build: ./post-app
+    networks:
+      - social-app
+    expose:
+      - "8081"
+    ports:
+      - "8081:8080"
+    restart: always
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://mongo-data/SocialApp
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://register-app:8761/eureka/
+      - SPRING_PROFILES_ACTIVE=dev,feign
+    depends_on:
+      - mongo-data
+      - register-app
+      - config-app
+
+  feed-app:
+    build: ./feed-app
+    networks:
+      - social-app
+    restart: always
+    expose:
+      - "8082"
+    ports:
+      - "8082:8080"
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://mongo-data/SocialApp
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://register-app:8761/eureka/
+      - SPRING_PROFILES_ACTIVE=dev,feign
+    depends_on:
+      - mongo-data
+      - register-app
+      - config-app
+
+  profile-app:
+    build: ./profile-app
+    networks:
+      - social-app
+    restart: always
+    expose:
+      - "8083"
+    ports:
+      - "8083:8080"
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://mongo-data/SocialApp
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://register-app:8761/eureka/
+      - SPRING_PROFILES_ACTIVE=dev,feign
+    depends_on:
+      - mongo-data
+      - register-app
+      - config-app
+
+  graphql-bff:
+    build: ./graphql-bff
+    networks:
+      - social-app
+    restart: always
+    expose:
+      - "9090"
+    ports:
+      - "9090:9090"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://register-app:8761/eureka/
+      - SPRING_PROFILES_ACTIVE=dev,graphql
+    depends_on:
+      - mongo-data
+      - register-app
+      - config-app
+
+  register-app:
+    build: ./registry-server
+    networks:
+      - social-app
+    expose:
+      - "8761"
+    ports:
+      - "8761:8761"
+
+  mongo-data:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - mongo-data:/data/db
+    expose:
+      - "27017"
+    ports:
+      - "27017:27017"
+    networks:
+      - social-app
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongo mongo:27017/test --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  config-app:
+    build: ./config-server
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://register-app:8761/eureka/
+    expose:
+      - "8888"
+    ports:
+      - "8888:8888"
+    networks:
+      - social-app
+    depends_on:
+      - register-app
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:8888/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  key-cloak:
+    image: jboss/keycloak
+    environment:
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=admin
+    volumes:
+      - type: bind
+        source: ./volumes/keycloak
+        target: /tmp
+    networks:
+      - social-app
+    ports:
+      - "8085:8080"
+    expose:
+      - 8085
+
+networks:
+  social-app:
+
+volumes:
+  mongo-data:

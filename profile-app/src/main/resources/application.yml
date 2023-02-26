@@ -21,7 +21,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8085/auth/realms/SocialApp
+          issuer-uri: http://key-cloak:8085/auth/realms/SocialApp
 
 eureka:
   client:
@@ -47,3 +47,10 @@ management:
       exposure:
         include": '*'
 
+grpc:
+  client:
+    postService:
+      address: "discovery:///post-app"
+      negotiation-type: plaintext
+  server:
+    port: 9093

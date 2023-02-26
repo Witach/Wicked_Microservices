@@ -30,6 +30,11 @@ fun main(args: Array<String>) {
 
                     }
                 }
+                profile("grpc") {
+                    bean {
+                        GRPCSessionStorage()
+                    }
+                }
                 bean {
                     ProfileService(ref(), ref(), ref(), ref())
                 }
@@ -55,6 +60,19 @@ fun main(args: Array<String>) {
                             }
                         )
                     }
+                }
+                profile("grpc") {
+                    bean<EventPublisherMock>()
+//                    bean {
+//                        routes(ref(), ref()).and(
+//                            router {
+//                                GET("/events") { req ->
+//                                    val events = ref<EventPublisherMock>().listMap
+//                                    ok().body(events)
+//                                }
+//                            }
+//                        )
+//                    }
                 }
                 profile("kafka") {
                     bean<KafkaObjectMapper>()

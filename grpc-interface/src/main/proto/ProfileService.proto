@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package com.example;
+
+option java_multiple_files = true;
+option java_package = "com.examples.lib";
+option java_outer_classname = "ProfileServiceProto";
+
+
+service ProfileService {
+  rpc addGroupToProfile (AddGroupToProfileMessage) returns (Empty);
+  rpc removeGroupFromProfile (RemoveGroupFromProfileMessage) returns (Empty);
+  rpc removeGroupFromProfiles (RemoveGroupFromProfileMessages) returns (Empty);
+  rpc loadProfileData (LoadProfileDataMessage) returns (LoadProfileDataResponse);
+}
+
+message LoadProfileDataResponse {
+  string profileID = 1;
+  string username = 2;
+  string birthday = 3;
+  string userId = 4;
+  repeated string groups = 5;
+  repeated string followed = 6;
+}
+
+message LoadProfileDataMessage {
+  string session = 1;
+  string profileId = 2;
+}
+
+message RemoveGroupFromProfileMessages {
+  string sessionId = 1;
+  string groupId = 2;
+  repeated string profiles = 3;
+}
+
+message RemoveGroupFromProfileMessage {
+  string session = 1;
+  string profileId = 2;
+  string groupId = 3;
+}
+
+message AddGroupToProfileMessage {
+  string session = 1;
+  string profileId = 2;
+  string groupToAdd = 3;
+}
+
+message Empty {
+}

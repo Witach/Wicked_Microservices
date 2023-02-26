@@ -1,0 +1,10 @@
+spring:
+  config:
+    import: "optional:configserver:"
+  application:
+    name: post-app
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8085/auth/realms/SocialApp

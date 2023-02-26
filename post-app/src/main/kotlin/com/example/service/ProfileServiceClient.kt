@@ -2,13 +2,17 @@ package com.example.service
 
 import com.example.RemoveGroupAssociations
 import com.example.applicationservice.ProfileService
+import com.example.applicationservice.SessionStorage
 import com.example.event.ProfileAddedEvent
 import com.example.event.RemoveProfileEvent
 import com.example.event.RemoveProfilesEvent
+import com.examples.lib.ProfileServiceGrpc.ProfileServiceBlockingStub
 import com.fasterxml.jackson.databind.ObjectMapper
+import net.devh.boot.grpc.client.inject.GrpcClient
 import org.springframework.context.annotation.Profile
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 import java.util.*
 
 @Component
@@ -48,6 +52,43 @@ class ProfileServiceClientKafka(val kafkaTemplate: KafkaTemplate<String, String>
         }
     }
 }
+
+@Profile("grpc")
+@Service
+class ProfileServiceGRPC(val sessionStorage: SessionStorage): ProfileService {
+
+    @GrpcClient("profileService") val profileServiceClient: ProfileServiceBlockingStub? = null
+    override fun addGroupToProfile(group: UUID, profile: UUID) {
+        profileServiceClient!!.addGroupToProfile(
+            com.examples.lib.AddGroupToProfileMessage.newBuilder()
+                .setSession(sessionStorage.sessionOwner.userId.toString())
+                .setGroupToAdd(group.toString())
+                .setProfileId(profile.toString())
+                .build()
+        )
+    }
+
+    override fun removeGroupFromProfile(group: UUID, profile: UUID) {
+        profileServiceClient!!.removeGroupFromProfile(
+            com.examples.lib.RemoveGroupFromProfileMessage.newBuilder()
+                .setSession(sessionStorage.sessionOwner.userId.toString())
+                .setGroupId(group.toString())
+                .setProfileId(profile.toString())
+                .build()
+        )
+    }
+
+    override fun removeGroupFromProfiles(group: UUID, profile: Set<UUID>) {
+        profileServiceClient!!.removeGroupFromProfiles(
+            com.examples.lib.RemoveGroupFromProfileMessages.newBuilder()
+                .setSessionId(sessionStorage.sessionOwner.userId.toString())
+                .setGroupId(group.toString())
+                .addAllProfiles(profile.map { it.toString() })
+                .build()
+        )
+    }
+}
+
 
 @Profile("dumb")
 @Component

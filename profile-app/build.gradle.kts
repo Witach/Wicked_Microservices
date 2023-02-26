@@ -14,7 +14,10 @@ repositories {
 dependencies {
     implementation(project(":service-chassis"))
     implementation(project(":profile-domain-module"))
-    implementation(project(mapOf("path" to ":post-domain-module")))
+    implementation(project(":post-domain-module"))
+    implementation("net.devh:grpc-client-spring-boot-starter:2.12.0.RELEASE")
+    implementation("net.devh:grpc-server-spring-boot-starter:2.12.0.RELEASE")
+    implementation(files("/home/dawid/Documents/projects/SocialApp/grpc-interface/build/libs/grpc-interface-0.0.1-SNAPSHOT.jar"))
 }
 
 tasks.getByName<Test>("test") {

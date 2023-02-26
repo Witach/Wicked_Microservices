@@ -1,33 +1,15 @@
+server:
+  port: 9090
 spring:
   config:
     import: "optional:configserver:"
   application:
-    name: post-app
+    name: kafka-gateway
   security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://key-cloak:8085/auth/realms/SocialApp
-  data:
-    mongodb:
-      host: localhost
-      database: SocialApp
-      password: example
-      username: root
-      port: 27017
-      authentication-database: admin
-      uuid-representation: standard
-
-server:
-  port: 8082
-
-grpc:
-  client:
-    profileService:
-      address: "discovery:///profile-app"
-      negotiation-type: plaintext
-  server:
-    port: 9091
+          issuer-uri: http://localhost:8085/auth/realms/SocialApp
 
 eureka:
   client:
@@ -44,33 +26,52 @@ auth-server:
   host: http://localhost:8085/
 
 kafka:
-  bootstrapServer: localhost:9092
+  bootstrapServer: localhost:9093
   topics:
-    - comment-create-request
-    - comment-delete-request
-    - reply-create-request
-    - reply-edit-request
-    - reply-delete-request
-    - group-create-request
-    - group-delete-request
-    - group-profileadd-request
-    - group-profileremove-request
-    - group-get-request
-    - grouppost-create-request
-    - grouppost-delete-request
-    - grouppost-get-request
-    - grouppost-update-request
-    - grouppost-get-request
-    - post-create-request
-    - post-delete-request
-    - post-update-request
-    - post-deleteattachment-request
-    - post-addattachment-request
-    - post-get-request
-    - feed-get-request
+    - comment-create-response
+    - comment-delete-response
+    - reply-create-response
+    - reply-edit-response
+    - reply-delete-response
+    - group-create-response
+    - group-delete-response
+    - group-profileadd-response
+    - group-profileremove-response
+    - group-get-response
+    - grouppost-create-response
+    - grouppost-delete-response
+    - grouppost-get-response
+    - grouppost-update-response
+    - grouppost-getall-response
+    - post-create-response
+    - post-delete-response
+    - post-update-response
+    - post-deleteattachment-response
+    - post-addattachment-response
+    - post-get-response
+    - feed-get-response
+    - group-exists-response
+    - profile-update-response
+    - profile-addtogroup-response
+    - profile-removefromgroup-response
+    - profile-starttofollow-response
+    - profile-stoptofollow-response
+    - user-creat-response
+    - user-delete-response
+    - user-update-response
+    - profile-getall-response
+    - profile-get-response
+    - user-get-response
+    - user-getall-response
+    - feed-loadgroup-response
+    - feed-loadgrouppost-response
+    - feed-loadprofilepost-response
+    - feed-search-response
 
 management:
   endpoints:
     web:
       exposure:
         include": '*'
+
+

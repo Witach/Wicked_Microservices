@@ -9,12 +9,9 @@ import com.example.servicechassis.ImperativeSessionStorage
 import com.example.servicechassis.KafkaObjectMapper
 import com.example.servicechassis.SUCCESS
 import org.springframework.kafka.annotation.KafkaListener
-import org.springframework.messaging.handler.annotation.SendTo
-import java.util.*
 
 class CommentListener(val commentService: CommentService, val kafkaObjectMapper: KafkaObjectMapper, val imperativeSessionStorage: ImperativeSessionStorage) {
     @KafkaListener(topics = ["comment-create-request"])
-    @SendTo("comment-create-response")
     fun `comment-create-request`(record: String): String {
         imperativeSessionStorage.userId = kafkaObjectMapper.readSession(record)
         val comment = kafkaObjectMapper.readBody(record, CommentCreateProjection::class.java)
@@ -28,7 +25,6 @@ class CommentListener(val commentService: CommentService, val kafkaObjectMapper:
     }
 
     @KafkaListener(topics = ["comment-delete-request"])
-    @SendTo("comment-delete-response")
     fun `delete-comment-message`(record: String): String {
         imperativeSessionStorage.userId = kafkaObjectMapper.readSession(record)
         val map = kafkaObjectMapper.readPathVariable(record, "profileId")
@@ -41,7 +37,6 @@ class CommentListener(val commentService: CommentService, val kafkaObjectMapper:
     }
 
     @KafkaListener(topics = ["reply-create-request"])
-    @SendTo("reply-create-response")
     fun `create-commentreply-message`(record: String): String {
         imperativeSessionStorage.userId = kafkaObjectMapper.readSession(record)
         val map = kafkaObjectMapper.readPathVariable(record, "commentId")
@@ -55,7 +50,6 @@ class CommentListener(val commentService: CommentService, val kafkaObjectMapper:
     }
 
     @KafkaListener(topics = ["reply-edit-request"])
-    @SendTo("reply-edit-response")
     fun `update-commentreply-message`(record: String): String {
         imperativeSessionStorage.userId = kafkaObjectMapper.readSession(record)
         val map = kafkaObjectMapper.readPathVariable(record, "commentId")
@@ -68,7 +62,6 @@ class CommentListener(val commentService: CommentService, val kafkaObjectMapper:
     }
 
     @KafkaListener(topics = ["reply-delete-request"])
-    @SendTo("reply-delete-response")
     fun `delete-commentreply-message`(record: String): String {
         imperativeSessionStorage.userId = kafkaObjectMapper.readSession(record)
         val map = kafkaObjectMapper.readPathVariable(record, "commentId")

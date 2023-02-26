@@ -5,10 +5,12 @@ import com.example.GroupPostCreateProjection
 import com.example.UpdatePostProjection
 import com.example.applicationservice.GroupPostService
 import com.example.applicationservice.PostService
-import com.example.servicechassis.*
+import com.example.servicechassis.FAILURE
+import com.example.servicechassis.ImperativeSessionStorage
+import com.example.servicechassis.KafkaObjectMapper
+import com.example.servicechassis.SUCCESS
 import org.example.EntityNotFoundException
 import org.springframework.kafka.annotation.KafkaListener
-import org.springframework.messaging.handler.annotation.SendTo
 import java.util.*
 
 class GroupPostListener(
@@ -18,7 +20,6 @@ class GroupPostListener(
     val imperativeSessionStorage: ImperativeSessionStorage
 ) {
     @KafkaListener(topics = ["grouppost-create-request"])
-    @SendTo("grouppost-create-response")
     fun `create-grouppost-message`(record: String): String {
         imperativeSessionStorage.userId = kafkaObjectMapper.readSession(record)
         val map = kafkaObjectMapper.readBody(record, GroupPostCreateProjection::class.java)
@@ -31,7 +32,6 @@ class GroupPostListener(
     }
 
     @KafkaListener(topics = ["grouppost-delete-request"])
-    @SendTo("grouppost-delete-response")
     fun `delete-grouppost-message`(record: String): String {
         imperativeSessionStorage.userId = kafkaObjectMapper.readSession(record)
         val map = kafkaObjectMapper.readParameter(record, "postId", UUID::class.java) ?: return FAILURE
@@ -44,7 +44,6 @@ class GroupPostListener(
     }
 
     @KafkaListener(topics = ["grouppost-get-request"])
-    @SendTo("grouppost-get-response")
     fun `get-grouppost-message`(record: String): String {
         imperativeSessionStorage.userId = kafkaObjectMapper.readSession(record)
         val map = kafkaObjectMapper.readPathVariable(record, "grouppostId") ?: return FAILURE
@@ -58,7 +57,6 @@ class GroupPostListener(
     }
 
     @KafkaListener(topics = ["grouppost-update-request"])
-    @SendTo("grouppost-update-response")
     fun `update-grouppost-message`(record: String): String {
         imperativeSessionStorage.userId = kafkaObjectMapper.readSession(record)
         val map = kafkaObjectMapper.readPathVariable(record, "postId")
@@ -73,7 +71,6 @@ class GroupPostListener(
     }
 
     @KafkaListener(topics = ["grouppost-getall-request"])
-    @SendTo("grouppost-getall-response")
     fun `grouppost-get-request`(record: String): String {
         imperativeSessionStorage.userId = kafkaObjectMapper.readSession(record)
         val groups = kafkaObjectMapper.readParamList<UUID>(record, "groupIds", UUID::class.java)

@@ -1,12 +1,8 @@
 package com.example.servicechassis
 
-import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.producer.ProducerRecord
-import org.apache.kafka.common.header.internals.RecordHeader
+import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.requestreply.ReplyingKafkaTemplate
-import org.springframework.kafka.requestreply.RequestReplyFuture
-import org.springframework.kafka.support.KafkaHeaders
-import org.springframework.kafka.support.SendResult
 import org.springframework.web.servlet.function.ServerResponse
 
 
@@ -21,6 +17,7 @@ fun kafkaProxy(init: KafkaProxy.() -> Unit): () -> ServerResponse {
     return  {
         kafkaProxyFun(proxy.requestTopic, proxy.responseTopic,
             proxy.kafkaTemplate!!, proxy.post)
+        ServerResponse.ok().build()
     }
 }
 
@@ -31,21 +28,11 @@ fun kafkaProxyFun(requestTopic: String, responseTopic: String,
 }
 
 fun kafkaProxyFunFeign(requestTopic: String, responseTopic: String,
-                  kafkaTemplate: ReplyingKafkaTemplate<String, String, String>, post: String): String {
+                  kafkaTemplate: KafkaTemplate<String, String>, post: String): String {
 
     val record: ProducerRecord<String, String> = ProducerRecord<String, String>(requestTopic, post)
-    record.headers().add(RecordHeader(KafkaHeaders.REPLY_TOPIC, responseTopic.toByteArray()))
-
-    val sendAndReceive: RequestReplyFuture<String, String, String> = kafkaTemplate.sendAndReceive(record)
-    val sendResult: SendResult<String, String> = sendAndReceive.sendFuture.get()
-
-    sendResult.producerRecord.headers().forEach { header ->
-        println(
-            header.key() + ":" + header.value().toString()
-        )
-    }
-    val consumerRecord: ConsumerRecord<String, String> = sendAndReceive.get()
-    return consumerRecord.value()
+    kafkaTemplate.send(record)
+    return "OK"
 }
 
 fun kafkaProxyFeign(init: KafkaProxy.() -> Unit): () -> String {

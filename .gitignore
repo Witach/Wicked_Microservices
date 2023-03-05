@@ -37,5 +37,4 @@ out/
 .vscode/
 
 ### Docker Bind Volumes ###
-volumes
-volumes/
+volumes/kafka/data

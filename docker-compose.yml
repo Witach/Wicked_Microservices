@@ -159,6 +159,8 @@ services:
 
   zookeeper:
     image: bitnami/zookeeper:latest
+    volumes:
+      - ./volumes/zookeeper:/bitnami/zookeeper
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
     networks:

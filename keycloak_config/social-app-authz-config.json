@@ -1,0 +1,32 @@
+{
+  "allowRemoteResourceManagement": true,
+  "policyEnforcementMode": "ENFORCING",
+  "resources": [
+    {
+      "name": "Default Resource",
+      "type": "urn:social-app:resources:default",
+      "ownerManagedAccess": false,
+      "attributes": {},
+      "_id": "10279f16-5822-424b-b14c-1b1bb1c9d703",
+      "uris": [
+        "/*"
+      ]
+    }
+  ],
+  "policies": [
+    {
+      "id": "4824ce13-88be-40d1-a887-05816b1ce122",
+      "name": "Default Permission",
+      "description": "A permission that applies to the default resource type",
+      "type": "resource",
+      "logic": "POSITIVE",
+      "decisionStrategy": "UNANIMOUS",
+      "config": {
+        "defaultResourceType": "urn:social-app:resources:default",
+        "applyPolicies": "[\"Default Policy\"]"
+      }
+    }
+  ],
+  "scopes": [],
+  "decisionStrategy": "UNANIMOUS"
+}

@@ -12,6 +12,7 @@ import com.example.servicechassis.KafkaObjectMapper
 import com.example.servicechassis.SUCCESS
 import org.example.EntityNotFoundException
 import org.springframework.kafka.annotation.KafkaListener
+import org.springframework.messaging.handler.annotation.SendTo
 
 class PostListener(
     val kafkaObjectMapper: KafkaObjectMapper,
@@ -20,6 +21,7 @@ class PostListener(
     val imperativeSessionStorage: ImperativeSessionStorage
 ) {
     @KafkaListener(topics = ["post-create-request"])
+    @SendTo("post-create-response")
     fun `create-post-message`(record: String): String {
         imperativeSessionStorage.userId = kafkaObjectMapper.readSession(record)
         val body = kafkaObjectMapper.readBody(record, PostCreatePorjection::class.java)
@@ -33,6 +35,7 @@ class PostListener(
     }
 
     @KafkaListener(topics = ["post-delete-request"])
+    @SendTo("post-delete-response")
     fun `delete-post-message`(record: String): String {
         imperativeSessionStorage.userId = kafkaObjectMapper.readSession(record)
         val map = kafkaObjectMapper.readPathVariable(record, "profileId")
@@ -46,6 +49,7 @@ class PostListener(
     }
 
     @KafkaListener(topics = ["post-update-request"])
+    @SendTo("post-update-response")
     fun `update-post-message`(record: String): String {
         imperativeSessionStorage.userId = kafkaObjectMapper.readSession(record)
         val body = kafkaObjectMapper.readBody(record, UpdatePostProjection::class.java)
@@ -60,6 +64,7 @@ class PostListener(
     }
 
     @KafkaListener(topics = ["post-deleteattachment-request"])
+    @SendTo("post-deleteattachment-response")
     fun `deleteattachment-post-message`(record: String): String {
         imperativeSessionStorage.userId = kafkaObjectMapper.readSession(record)
         val postId = kafkaObjectMapper.readPathVariable(record, "postId")
@@ -82,6 +87,7 @@ class PostListener(
     }
 
     @KafkaListener(topics = ["post-get-request"])
+    @SendTo("post-get-response")
     fun `post-get-request`(record: String): String {
         imperativeSessionStorage.userId = kafkaObjectMapper.readSession(record)
         val map = kafkaObjectMapper.readBody(record, ProfileToSearchForProjection::class.java)
@@ -99,6 +105,7 @@ class PostListener(
     }
 
     @KafkaListener(topics = ["post-getall-request"])
+    @SendTo("post-getall-response")
     fun `feed-get-request`(record: String): String {
         imperativeSessionStorage.userId = kafkaObjectMapper.readSession(record)
         val feedSearch = kafkaObjectMapper.readBody(record, FeedSearch::class.java)

@@ -7,6 +7,7 @@ import com.example.servicechassis.ImperativeSessionStorage
 import com.example.servicechassis.KafkaObjectMapper
 import com.example.servicechassis.tryToResponse
 import org.springframework.kafka.annotation.KafkaListener
+import org.springframework.messaging.handler.annotation.SendTo
 
 class Listeners(val imperativeSessionStorage: ImperativeSessionStorage,
                 val kafklaObjectMapper: KafkaObjectMapper,
@@ -16,6 +17,7 @@ class Listeners(val imperativeSessionStorage: ImperativeSessionStorage,
 ) {
 
     @KafkaListener(topics = ["feed-loadgroup-request"])
+    @SendTo("feed-loadgroup-response")
     fun `create-post-message`(record: String): String {
         imperativeSessionStorage.userId = kafklaObjectMapper.readSession(record)
         val group = kafklaObjectMapper.readPathVariable(record, "groupId")
@@ -26,6 +28,7 @@ class Listeners(val imperativeSessionStorage: ImperativeSessionStorage,
 
 
     @KafkaListener(topics = ["feed-loadgrouppost-request"])
+    @SendTo("feed-loadgrouppost-response")
     fun `feed-loadgroup-request`(record: String): String {
         imperativeSessionStorage.userId = kafklaObjectMapper.readSession(record)
         val group = kafklaObjectMapper.readPathVariable(record, "groupId")
@@ -35,6 +38,7 @@ class Listeners(val imperativeSessionStorage: ImperativeSessionStorage,
     }
 
     @KafkaListener(topics = ["feed-loadprofilepost-request"])
+    @SendTo("feed-loadprofilepost-response")
     fun `feed-loadprofilepost-request`(record: String): String {
         imperativeSessionStorage.userId = kafklaObjectMapper.readSession(record)
         val group = kafklaObjectMapper.readPathVariable(record, "profileId")
@@ -46,6 +50,7 @@ class Listeners(val imperativeSessionStorage: ImperativeSessionStorage,
     }
 
     @KafkaListener(topics = ["feed-search-request"])
+    @SendTo("feed-search-response")
     fun `feed-search-request`(record: String): String {
         imperativeSessionStorage.userId = kafklaObjectMapper.readSession(record)
         val feedSearch = kafklaObjectMapper.readPathVariable(record, "profileId")

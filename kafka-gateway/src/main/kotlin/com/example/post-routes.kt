@@ -2,19 +2,18 @@ package com.example
 
 import com.example.servicechassis.KafkaObjectMapper
 import com.example.servicechassis.kafkaProxy
-import org.springframework.kafka.requestreply.ReplyingKafkaTemplate
+import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.web.servlet.function.RouterFunction
 import org.springframework.web.servlet.function.ServerResponse
 import org.springframework.web.servlet.function.body
 import org.springframework.web.servlet.function.router
 
-fun postRoutes(replyingKafakTemplate: ReplyingKafkaTemplate<String, String, String>, kafkaObjectMapper: KafkaObjectMapper): RouterFunction<ServerResponse> {
+fun postRoutes(replyingKafakTemplate: KafkaTemplate<String, String>, kafkaObjectMapper: KafkaObjectMapper): RouterFunction<ServerResponse> {
     return router {
         path("/post").nest {
             POST("") {
                 kafkaProxy {
                     requestTopic = "post-create-request"
-                    responseTopic = "post-create-response"
                     kafkaTemplate = replyingKafakTemplate
                     post = kafkaObjectMapper.convertToMessageFromBodyObject(it.body())
                 } ()
@@ -22,7 +21,6 @@ fun postRoutes(replyingKafakTemplate: ReplyingKafkaTemplate<String, String, Stri
             GET("") {
                 kafkaProxy {
                     requestTopic = "post-get-request"
-                    responseTopic = "post-get-response"
                     kafkaTemplate = replyingKafakTemplate
                     post = kafkaObjectMapper.convertToMessageFromBodyObject(it.body())
                 } ()
@@ -30,7 +28,6 @@ fun postRoutes(replyingKafakTemplate: ReplyingKafkaTemplate<String, String, Stri
             DELETE("{profileId}") {
                 kafkaProxy {
                     requestTopic = "post-delete-request"
-                    responseTopic = "post-delete-response"
                     kafkaTemplate = replyingKafakTemplate
                     post = kafkaObjectMapper.convertToMessageFromPathVariable("profileId" to it.pathVariable("profileId"))
                 } ()
@@ -38,7 +35,6 @@ fun postRoutes(replyingKafakTemplate: ReplyingKafkaTemplate<String, String, Stri
             PUT("{postId}") {
                 kafkaProxy {
                     requestTopic = "post-update-request"
-                    responseTopic = "post-update-response"
                     kafkaTemplate = replyingKafakTemplate
                     post = kafkaObjectMapper.convertToMessageFrom {
                         pathVariable = mapOf(
@@ -51,7 +47,6 @@ fun postRoutes(replyingKafakTemplate: ReplyingKafkaTemplate<String, String, Stri
             DELETE("/{postId}/attachment/{attachmentId}") {
                 kafkaProxy {
                     requestTopic = "post-deleteattachment-request"
-                    responseTopic = "post-deleteattachment-response"
                     kafkaTemplate = replyingKafakTemplate
                     post = kafkaObjectMapper.convertToMessageFrom {
                         pathVariable = mapOf(
@@ -64,4 +59,3 @@ fun postRoutes(replyingKafakTemplate: ReplyingKafkaTemplate<String, String, Stri
         }
     }
 }
-// kafka-console-consumer.sh --topic post-get-request --from-beginning --bootstrap-server localhost:9092

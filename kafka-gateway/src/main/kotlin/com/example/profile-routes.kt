@@ -2,19 +2,18 @@ package com.example
 
 import com.example.servicechassis.KafkaObjectMapper
 import com.example.servicechassis.kafkaProxy
-import org.springframework.kafka.requestreply.ReplyingKafkaTemplate
+import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.web.servlet.function.RouterFunction
 import org.springframework.web.servlet.function.ServerResponse
 import org.springframework.web.servlet.function.body
 import org.springframework.web.servlet.function.router
 
-fun profileRoutes(replayingKafkaTemplate: ReplyingKafkaTemplate<String, String, String>, kafkaObjectMapper: KafkaObjectMapper): RouterFunction<ServerResponse> {
+fun profileRoutes(replayingKafkaTemplate: KafkaTemplate<String, String>, kafkaObjectMapper: KafkaObjectMapper): RouterFunction<ServerResponse> {
     return router {
         path("/profile").nest {
             PUT("{profileId}") {
                 kafkaProxy {
                     requestTopic = "profile-update-request"
-                    responseTopic = "profile-update-response"
                     kafkaTemplate = replayingKafkaTemplate
                     post = kafkaObjectMapper.convertToMessageFrom {
                         pathVariable = mapOf(
@@ -27,7 +26,6 @@ fun profileRoutes(replayingKafkaTemplate: ReplyingKafkaTemplate<String, String, 
             POST("/{profileId}/group") {
                 kafkaProxy {
                     requestTopic = "profile-addtogroup-request"
-                    responseTopic = "profile-addtogroup-response"
                     kafkaTemplate = replayingKafkaTemplate
                     post = kafkaObjectMapper.convertToMessageFrom {
                         pathVariable = mapOf(
@@ -42,7 +40,6 @@ fun profileRoutes(replayingKafkaTemplate: ReplyingKafkaTemplate<String, String, 
             DELETE("/{profileId}/group") {
                 kafkaProxy {
                     requestTopic = "profile-removefromgroup-request"
-                    responseTopic = "profile-removefromgroup-response"
                     kafkaTemplate = replayingKafkaTemplate
                     post = kafkaObjectMapper.convertToMessageFrom {
                         pathVariable = mapOf(
@@ -57,7 +54,6 @@ fun profileRoutes(replayingKafkaTemplate: ReplyingKafkaTemplate<String, String, 
             POST("/{profileId}/follow") {
                 kafkaProxy {
                     requestTopic = "profile-starttofollow-request"
-                    responseTopic = "profile-starttofollow-response"
                     kafkaTemplate = replayingKafkaTemplate
                     post = kafkaObjectMapper.convertToMessageFrom {
                         pathVariable = mapOf(
@@ -70,7 +66,6 @@ fun profileRoutes(replayingKafkaTemplate: ReplyingKafkaTemplate<String, String, 
             DELETE("/{profileId}/follow") {
                 kafkaProxy {
                     requestTopic = "profile-stoptofollow-request"
-                    responseTopic = "profile-stoptofollow-response"
                     kafkaTemplate = replayingKafkaTemplate
                     post = kafkaObjectMapper.convertToMessageFrom {
                         pathVariable = mapOf(
@@ -86,7 +81,6 @@ fun profileRoutes(replayingKafkaTemplate: ReplyingKafkaTemplate<String, String, 
             GET("") {
                 kafkaProxy {
                     requestTopic = "profile-getall-request"
-                    responseTopic = "profile-getall-response"
                     kafkaTemplate = replayingKafkaTemplate
                     post = kafkaObjectMapper.convertToMessageFrom {
                         param = mapOf(
@@ -98,7 +92,6 @@ fun profileRoutes(replayingKafkaTemplate: ReplyingKafkaTemplate<String, String, 
             GET("/{profileId}") {
                 kafkaProxy {
                     requestTopic = "profile-get-request"
-                    responseTopic = "profile-get-response"
                     kafkaTemplate = replayingKafkaTemplate
                     post = kafkaObjectMapper.convertToMessageFromPathVariable("profileId" to it.pathVariable("profileId"))
                 } ()
@@ -108,7 +101,6 @@ fun profileRoutes(replayingKafkaTemplate: ReplyingKafkaTemplate<String, String, 
             POST("") {
                 kafkaProxy {
                     requestTopic = "user-creat-request"
-                    responseTopic = "user-creat-response"
                     kafkaTemplate = replayingKafkaTemplate
                     post = kafkaObjectMapper.convertToMessageFromBodyObject(it.body())
                 } ()
@@ -116,7 +108,6 @@ fun profileRoutes(replayingKafkaTemplate: ReplyingKafkaTemplate<String, String, 
             DELETE("/{userId}") {
                 kafkaProxy {
                     requestTopic = "user-delete-request"
-                    responseTopic = "user-delete-response"
                     kafkaTemplate = replayingKafkaTemplate
                     post = kafkaObjectMapper.convertToMessageFromPathVariable("userId" to it.pathVariable("userId"))
                 } ()
@@ -124,7 +115,6 @@ fun profileRoutes(replayingKafkaTemplate: ReplyingKafkaTemplate<String, String, 
             PUT("/{userId}") {
                 kafkaProxy {
                     requestTopic = "user-update-request"
-                    responseTopic = "user-update-response"
                     kafkaTemplate = replayingKafkaTemplate
                     post = kafkaObjectMapper.convertToMessageFrom {
                         pathVariable = mapOf(
@@ -137,7 +127,6 @@ fun profileRoutes(replayingKafkaTemplate: ReplyingKafkaTemplate<String, String, 
             GET("/{userId}") {
                 kafkaProxy {
                     requestTopic = "user-get-request"
-                    responseTopic = "user-get-response"
                     kafkaTemplate = replayingKafkaTemplate
                     post = kafkaObjectMapper.convertToMessageFromPathVariable("userId" to it.pathVariable("userId"))
                 } ()
@@ -145,7 +134,6 @@ fun profileRoutes(replayingKafkaTemplate: ReplyingKafkaTemplate<String, String, 
             GET("") {
                 kafkaProxy {
                     requestTopic = "user-getall-request"
-                    responseTopic = "user-getall-response"
                     kafkaTemplate = replayingKafkaTemplate
                     post = kafkaObjectMapper.convertToMessageFromPathVariable("x" to "x")
                 } ()

@@ -28,7 +28,7 @@ fun main(args: Array<String>) {
                 }
                 bean<KafkaObjectMapper>()
                 beanDefinitions(this)
-                kafkaReplyingProducers(this)
+                kafkaProducers(this)
                 bean {
                     filterChain(ref(), ::devRestrictions)
                 }
@@ -46,7 +46,6 @@ fun main(args: Array<String>) {
                             GET("") {
                                 kafkaProxy {
                                     requestTopic = "feed-get-request"
-                                    responseTopic = "feed-get-response"
                                     kafkaTemplate = ref()
                                     post = ref<KafkaObjectMapper>().convertToMessageFrom {
                                         param = mapOf(

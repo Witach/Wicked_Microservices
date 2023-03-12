@@ -27,7 +27,6 @@ class GroupServiceClientImplKafka(val kafkaClient: ReplyingKafkaTemplate<String,
         val response = kafkaProxyFeign {
             kafkaTemplate = kafkaClient
             requestTopic = "group-exists-request"
-            responseTopic = "group-exists-response"
             post = kafkaObjectMapper.convertToMessageFromPathVariable("groupId" to group.toString())
         }()
         return response == "true"

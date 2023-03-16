@@ -34,6 +34,8 @@ fun filterChain(http: HttpSecurity, restrictionFun: Customizer<UrlRestrictions>)
         .csrf().disable()
         .cors().disable()
         .oauth2ResourceServer { it.jwt() }
+        .csrf().disable()
+        .headers().frameOptions().disable().and()
         .build()
 }
 

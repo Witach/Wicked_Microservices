@@ -6,7 +6,11 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.runApplication
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.context.support.beans
+import org.springframework.jdbc.datasource.DataSourceTransactionManager
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType
 import org.springframework.kafka.annotation.EnableKafka
+import org.springframework.session.jdbc.config.annotation.web.http.EnableJdbcHttpSession
 import org.springframework.web.servlet.function.*
 import java.util.*
 
@@ -14,6 +18,7 @@ import java.util.*
 @EnableKafka
 @EnableFeignClients
 @SpringBootApplication
+@EnableJdbcHttpSession
 @EnableConfigurationProperties(AuthClientProp::class)
 class KafkaGateway
 
@@ -21,6 +26,15 @@ fun main(args: Array<String>) {
     runApplication<KafkaGateway>(*args) {
         addInitializers(
             beans {
+                bean {
+                    EmbeddedDatabaseBuilder()
+                        .setType(EmbeddedDatabaseType.H2)
+                        .addScript("classpath:org/springframework/session/jdbc/schema-h2.sql")
+                        .build()
+                }
+                bean {
+                    DataSourceTransactionManager(ref())
+                }
                 profile("kafka") {
                     bean {
                         SessionStorageImpl()

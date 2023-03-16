@@ -15,6 +15,8 @@ dependencies {
 
     implementation(project(":service-chassis"))
     implementation(project(":DDD"))
+    implementation("org.springframework.session:spring-session-jdbc")
+    implementation("com.h2database:h2:1.4.197")
 }
 
 tasks.getByName<Test>("test") {

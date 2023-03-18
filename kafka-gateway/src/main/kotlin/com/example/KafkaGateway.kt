@@ -10,6 +10,8 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType
 import org.springframework.kafka.annotation.EnableKafka
+import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.session.jdbc.config.annotation.web.http.EnableJdbcHttpSession
 import org.springframework.web.servlet.function.*
 import java.util.*
@@ -44,7 +46,14 @@ fun main(args: Array<String>) {
                 beanDefinitions(this)
                 kafkaProducers(this)
                 bean {
-                    filterChain(ref(), ::devRestrictions)
+                    ref<HttpSecurity>().authorizeRequests().anyRequest().permitAll().and()
+                        .csrf().disable()
+                        .cors().disable()
+                        .oauth2ResourceServer { it.jwt() }
+                        .csrf().disable()
+                        .headers().frameOptions().disable().and()
+                        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.ALWAYS).and()
+                        .build()
                 }
                 bean {
                     groupRoutes(ref(), ref())

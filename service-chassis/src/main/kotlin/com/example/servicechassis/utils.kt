@@ -20,6 +20,7 @@ import org.springframework.kafka.requestreply.ReplyingKafkaTemplate
 import org.springframework.security.config.Customizer
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer
+import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.web.servlet.function.ServerRequest
 import org.springframework.web.servlet.function.paramOrNull
@@ -36,6 +37,7 @@ fun filterChain(http: HttpSecurity, restrictionFun: Customizer<UrlRestrictions>)
         .oauth2ResourceServer { it.jwt() }
         .csrf().disable()
         .headers().frameOptions().disable().and()
+        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.ALWAYS).and()
         .build()
 }
 

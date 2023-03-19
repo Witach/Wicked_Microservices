@@ -51,6 +51,7 @@ fun main(args: Array<String>) {
                     bean {
                         ImperativeSessionStorage()
                     }
+                    bean<KafkaAnswerTemplate>()
                 }
             }
         )

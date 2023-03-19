@@ -4,6 +4,7 @@ import com.example.servicechassis.*
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.runApplication
+import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.context.support.beans
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
@@ -34,6 +35,7 @@ fun main(args: Array<String>) {
                         .addScript("classpath:org/springframework/session/jdbc/schema-h2.sql")
                         .build()
                 }
+                bean<SSEConnectionStorage>()
                 bean {
                     DataSourceTransactionManager(ref())
                 }
@@ -45,6 +47,7 @@ fun main(args: Array<String>) {
                 bean<KafkaObjectMapper>()
                 beanDefinitions(this)
                 kafkaProducers(this)
+                bean<Listener>()
                 bean {
                     ref<HttpSecurity>().authorizeRequests().anyRequest().permitAll().and()
                         .csrf().disable()
@@ -64,7 +67,24 @@ fun main(args: Array<String>) {
                         .and(feedRoutes(ref(), ref()))
                 }
                 bean {
+                    val registrationBean: FilterRegistrationBean<SessionIdFilter> = FilterRegistrationBean()
+                    registrationBean.setFilter(SessionIdFilter())
+                    registrationBean.addUrlPatterns("/sse")
+                    registrationBean
+                }
+                bean {
                     router {
+//                        GET("/subscribeToData") {
+//                            val sse = SseEmitter()
+//                            sse.send(
+//                                SseEmitter.event()
+//                                    .data("SSE MVC - " + LocalTime.now().toString())
+//                                    .id(UUID.randomUUID().toString())
+//                                    .name("sse event - mvc")
+//                            )
+//                            ref<SSEConnectionStorage>().addConnection(it.session(), sse)
+//                            ServerResponse.sse(sse)
+//                        }
                         path("/feed").nest {
                             GET("") {
                                 kafkaProxy {

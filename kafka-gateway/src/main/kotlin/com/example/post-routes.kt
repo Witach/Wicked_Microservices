@@ -15,6 +15,7 @@ fun postRoutes(replyingKafakTemplate: KafkaTemplate<String, String>, kafkaObject
                 kafkaProxy {
                     requestTopic = "post-create-request"
                     kafkaTemplate = replyingKafakTemplate
+                    sessionId = ((it.session().getAttribute("session-id") ?: "" )as String)
                     post = kafkaObjectMapper.convertToMessageFromBodyObject(it.body())
                 } ()
             }
@@ -22,6 +23,7 @@ fun postRoutes(replyingKafakTemplate: KafkaTemplate<String, String>, kafkaObject
                 kafkaProxy {
                     requestTopic = "post-get-request"
                     kafkaTemplate = replyingKafakTemplate
+                    sessionId = ((it.session().getAttribute("session-id") ?: "" )as String)
                     post = kafkaObjectMapper.convertToMessageFromBodyObject(it.body())
                 } ()
             }
@@ -29,6 +31,7 @@ fun postRoutes(replyingKafakTemplate: KafkaTemplate<String, String>, kafkaObject
                 kafkaProxy {
                     requestTopic = "post-delete-request"
                     kafkaTemplate = replyingKafakTemplate
+                    sessionId = ((it.session().getAttribute("session-id") ?: "" )as String)
                     post = kafkaObjectMapper.convertToMessageFromPathVariable("profileId" to it.pathVariable("profileId"))
                 } ()
             }
@@ -36,6 +39,7 @@ fun postRoutes(replyingKafakTemplate: KafkaTemplate<String, String>, kafkaObject
                 kafkaProxy {
                     requestTopic = "post-update-request"
                     kafkaTemplate = replyingKafakTemplate
+                    sessionId = ((it.session().getAttribute("session-id") ?: "" )as String)
                     post = kafkaObjectMapper.convertToMessageFrom {
                         pathVariable = mapOf(
                             "postId" to it.pathVariable("postId")
@@ -48,6 +52,7 @@ fun postRoutes(replyingKafakTemplate: KafkaTemplate<String, String>, kafkaObject
                 kafkaProxy {
                     requestTopic = "post-deleteattachment-request"
                     kafkaTemplate = replyingKafakTemplate
+                    sessionId = ((it.session().getAttribute("session-id") ?: "" )as String)
                     post = kafkaObjectMapper.convertToMessageFrom {
                         pathVariable = mapOf(
                             "postId" to it.pathVariable("postId"),

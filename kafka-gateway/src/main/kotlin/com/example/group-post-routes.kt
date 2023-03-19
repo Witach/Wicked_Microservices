@@ -15,6 +15,7 @@ fun groupPostRoutes(replyingKafkaTemplate: KafkaTemplate<String, String>, kafkaO
                 kafkaProxy {
                     requestTopic = "grouppost-create-request"
                     kafkaTemplate = replyingKafkaTemplate
+                    sessionId = ((it.session().getAttribute("session-id") ?: "" )as String)
                     post = kafkaObjectMapper.convertToMessageFromBodyObject(it.body())
                 } ()
             }
@@ -22,6 +23,7 @@ fun groupPostRoutes(replyingKafkaTemplate: KafkaTemplate<String, String>, kafkaO
                 kafkaProxy {
                     requestTopic = "grouppost-get-request"
                     kafkaTemplate = replyingKafkaTemplate
+                    sessionId = ((it.session().getAttribute("session-id") ?: "" )as String)
                     post = kafkaObjectMapper.convertToMessageFrom {
                         pathVariable = mapOf(
                             "grouppostId" to it.pathVariable("groppostId").toString()

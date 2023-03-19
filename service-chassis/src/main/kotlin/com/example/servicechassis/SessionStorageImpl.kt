@@ -11,7 +11,11 @@ class SessionStorageImpl: SessionStorage {
     override val sessionOwner: SessionStorage.UserInfo
         get()   {
             val auth = SecurityContextHolder.getContext().authentication
-            return  SessionStorage.UserInfo((auth.principal as Jwt).claims["email"].toString(), auth.name.toUUID());
+            if(auth.principal == "anonymousUser") {
+                return SessionStorage.UserInfo("", UUID.randomUUID());
+            } else {
+                return  SessionStorage.UserInfo((auth.principal as Jwt).claims["email"].toString(), auth.name.toUUID());
+            }
         }
 }
 

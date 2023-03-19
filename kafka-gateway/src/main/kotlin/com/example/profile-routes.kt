@@ -15,6 +15,7 @@ fun profileRoutes(replayingKafkaTemplate: KafkaTemplate<String, String>, kafkaOb
                 kafkaProxy {
                     requestTopic = "profile-update-request"
                     kafkaTemplate = replayingKafkaTemplate
+                    sessionId = ((it.session().getAttribute("session-id") ?: "" )as String)
                     post = kafkaObjectMapper.convertToMessageFrom {
                         pathVariable = mapOf(
                             "profileId" to it.pathVariable("profileId")
@@ -27,6 +28,7 @@ fun profileRoutes(replayingKafkaTemplate: KafkaTemplate<String, String>, kafkaOb
                 kafkaProxy {
                     requestTopic = "profile-addtogroup-request"
                     kafkaTemplate = replayingKafkaTemplate
+                    sessionId = ((it.session().getAttribute("session-id") ?: "" )as String)
                     post = kafkaObjectMapper.convertToMessageFrom {
                         pathVariable = mapOf(
                             "profileId" to it.pathVariable("profileId")
@@ -41,6 +43,7 @@ fun profileRoutes(replayingKafkaTemplate: KafkaTemplate<String, String>, kafkaOb
                 kafkaProxy {
                     requestTopic = "profile-removefromgroup-request"
                     kafkaTemplate = replayingKafkaTemplate
+                    sessionId = ((it.session().getAttribute("session-id") ?: "" )as String)
                     post = kafkaObjectMapper.convertToMessageFrom {
                         pathVariable = mapOf(
                             "profileId" to it.pathVariable("profileId")
@@ -55,6 +58,7 @@ fun profileRoutes(replayingKafkaTemplate: KafkaTemplate<String, String>, kafkaOb
                 kafkaProxy {
                     requestTopic = "profile-starttofollow-request"
                     kafkaTemplate = replayingKafkaTemplate
+                    sessionId = ((it.session().getAttribute("session-id") ?: "" )as String)
                     post = kafkaObjectMapper.convertToMessageFrom {
                         pathVariable = mapOf(
                             "profileId" to it.pathVariable("profileId")
@@ -67,6 +71,7 @@ fun profileRoutes(replayingKafkaTemplate: KafkaTemplate<String, String>, kafkaOb
                 kafkaProxy {
                     requestTopic = "profile-stoptofollow-request"
                     kafkaTemplate = replayingKafkaTemplate
+                    sessionId = ((it.session().getAttribute("session-id") ?: "" )as String)
                     post = kafkaObjectMapper.convertToMessageFrom {
                         pathVariable = mapOf(
                             "profileId" to it.pathVariable("profileId")
@@ -82,6 +87,7 @@ fun profileRoutes(replayingKafkaTemplate: KafkaTemplate<String, String>, kafkaOb
                 kafkaProxy {
                     requestTopic = "profile-getall-request"
                     kafkaTemplate = replayingKafkaTemplate
+                    sessionId = ((it.session().getAttribute("session-id") ?: "" )as String)
                     post = kafkaObjectMapper.convertToMessageFrom {
                         param = mapOf(
                             "groupId" to it.param("groupId").orElse("")
@@ -93,6 +99,7 @@ fun profileRoutes(replayingKafkaTemplate: KafkaTemplate<String, String>, kafkaOb
                 kafkaProxy {
                     requestTopic = "profile-get-request"
                     kafkaTemplate = replayingKafkaTemplate
+                    sessionId = ((it.session().getAttribute("session-id") ?: "" )as String)
                     post = kafkaObjectMapper.convertToMessageFromPathVariable("profileId" to it.pathVariable("profileId"))
                 } ()
             }
@@ -102,6 +109,7 @@ fun profileRoutes(replayingKafkaTemplate: KafkaTemplate<String, String>, kafkaOb
                 kafkaProxy {
                     requestTopic = "user-creat-request"
                     kafkaTemplate = replayingKafkaTemplate
+                    sessionId = ""
                     post = kafkaObjectMapper.convertToMessageFromBodyObject(it.body())
                 } ()
             }
@@ -109,6 +117,7 @@ fun profileRoutes(replayingKafkaTemplate: KafkaTemplate<String, String>, kafkaOb
                 kafkaProxy {
                     requestTopic = "user-delete-request"
                     kafkaTemplate = replayingKafkaTemplate
+                    sessionId = ((it.session().getAttribute("session-id") ?: "" )as String)
                     post = kafkaObjectMapper.convertToMessageFromPathVariable("userId" to it.pathVariable("userId"))
                 } ()
             }
@@ -116,6 +125,7 @@ fun profileRoutes(replayingKafkaTemplate: KafkaTemplate<String, String>, kafkaOb
                 kafkaProxy {
                     requestTopic = "user-update-request"
                     kafkaTemplate = replayingKafkaTemplate
+                    sessionId = ((it.session().getAttribute("session-id") ?: "" )as String)
                     post = kafkaObjectMapper.convertToMessageFrom {
                         pathVariable = mapOf(
                             "userId" to it.pathVariable("userId")
@@ -128,6 +138,7 @@ fun profileRoutes(replayingKafkaTemplate: KafkaTemplate<String, String>, kafkaOb
                 kafkaProxy {
                     requestTopic = "user-get-request"
                     kafkaTemplate = replayingKafkaTemplate
+                    sessionId = ((it.session().getAttribute("session-id") ?: "" )as String)
                     post = kafkaObjectMapper.convertToMessageFromPathVariable("userId" to it.pathVariable("userId"))
                 } ()
             }
@@ -135,6 +146,7 @@ fun profileRoutes(replayingKafkaTemplate: KafkaTemplate<String, String>, kafkaOb
                 kafkaProxy {
                     requestTopic = "user-getall-request"
                     kafkaTemplate = replayingKafkaTemplate
+                    sessionId = ((it.session().getAttribute("session-id") ?: "" )as String)
                     post = kafkaObjectMapper.convertToMessageFromPathVariable("x" to "x")
                 } ()
             }

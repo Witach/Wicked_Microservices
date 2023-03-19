@@ -17,6 +17,7 @@ fun groupRoutes(replayingKafkaTemplate: KafkaTemplate<String, String>, kafkaObje
                 kafkaProxy {
                     requestTopic = "grouppost-getall-request"
                     kafkaTemplate = replayingKafkaTemplate
+                    sessionId = ((it.session().getAttribute("session-id") ?: "" )as String)
                     post = kafkaObjectMapper.convertToMessageFrom {
                         param = mapOf(
                             "groupIds" to it.param("groupIds").orElse("")
@@ -28,6 +29,7 @@ fun groupRoutes(replayingKafkaTemplate: KafkaTemplate<String, String>, kafkaObje
                 kafkaProxy {
                     requestTopic = "group-get-request"
                     kafkaTemplate = replayingKafkaTemplate
+                    sessionId = ((it.session().getAttribute("session-id") ?: "" )as String)
                     post = kafkaObjectMapper.convertToMessageFromBodyObject(it.body())
                 } ()
             }
@@ -35,6 +37,7 @@ fun groupRoutes(replayingKafkaTemplate: KafkaTemplate<String, String>, kafkaObje
                 kafkaProxy {
                     requestTopic = "group-create-request"
                     kafkaTemplate = replayingKafkaTemplate
+                    sessionId = ((it.session().getAttribute("session-id") ?: "" )as String)
                     post = kafkaObjectMapper.convertToMessageFromBodyObject(it.body())
                 } ()
             }
@@ -42,6 +45,7 @@ fun groupRoutes(replayingKafkaTemplate: KafkaTemplate<String, String>, kafkaObje
                 kafkaProxy {
                     requestTopic = "group-get-request"
                     kafkaTemplate = replayingKafkaTemplate
+                    sessionId = ((it.session().getAttribute("session-id") ?: "" )as String)
                     post = kafkaObjectMapper.convertToMessageFromPathVariable("groupId" to it.pathVariable("groupId").toString())
                 } ()
             }
@@ -49,6 +53,7 @@ fun groupRoutes(replayingKafkaTemplate: KafkaTemplate<String, String>, kafkaObje
                 kafkaProxy {
                     requestTopic = "group-exists-request"
                     kafkaTemplate = replayingKafkaTemplate
+                    sessionId = ((it.session().getAttribute("session-id") ?: "" )as String)
                     post = kafkaObjectMapper.convertToMessageFromPathVariable("groupId" to it.pathVariable("groupId").toString())
                 } ()
             }
@@ -56,6 +61,7 @@ fun groupRoutes(replayingKafkaTemplate: KafkaTemplate<String, String>, kafkaObje
                 kafkaProxy {
                     requestTopic = "group-delete-request"
                     kafkaTemplate = replayingKafkaTemplate
+                    sessionId = ((it.session().getAttribute("session-id") ?: "" )as String)
                     post = kafkaObjectMapper.convertToMessageFromPathVariable("groupId" to it.pathVariable("groupId").toString())
                 } ()
             }
@@ -63,6 +69,7 @@ fun groupRoutes(replayingKafkaTemplate: KafkaTemplate<String, String>, kafkaObje
                 kafkaProxy {
                     requestTopic = "group-profileremove-request"
                     kafkaTemplate = replayingKafkaTemplate
+                    sessionId = ((it.session().getAttribute("session-id") ?: "" )as String)
                     post = kafkaObjectMapper.convertToMessageFrom {
                         pathVariable = mapOf(
                             "groupId" to it.map("groupId").toString(),
@@ -75,6 +82,7 @@ fun groupRoutes(replayingKafkaTemplate: KafkaTemplate<String, String>, kafkaObje
                 kafkaProxy {
                     requestTopic = "group-update-request"
                     kafkaTemplate = replayingKafkaTemplate
+                    sessionId = ((it.session().getAttribute("session-id") ?: "" )as String)
                     post = kafkaObjectMapper.convertToMessageFromPathVariable("groupId" to it.map("groupId").toString())
                 } ()
             }
@@ -82,6 +90,7 @@ fun groupRoutes(replayingKafkaTemplate: KafkaTemplate<String, String>, kafkaObje
                 kafkaProxy {
                     requestTopic = "group-profileadd-request"
                     kafkaTemplate = replayingKafkaTemplate
+                    sessionId = ((it.session().getAttribute("session-id") ?: "" )as String)
                     post = kafkaObjectMapper.convertToMessageFrom {
                         pathVariable = mapOf(
                             "groupId" to it.map("groupId").toString(),

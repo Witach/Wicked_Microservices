@@ -15,6 +15,7 @@ fun feedRoutes(replyingKafkaTemplate: KafkaTemplate<String, String>, kafkaObject
                     kafkaProxy {
                         requestTopic = "feed-loadgroup-request"
                         kafkaTemplate = replyingKafkaTemplate
+                        sessionId = ((it.session().getAttribute("session-id") ?: "" )as String)
                         post =
                             kafkaObjectMapper.convertToMessageFromPathVariable("groupId" to it.pathVariable("groupId"))
                     }()
@@ -23,6 +24,7 @@ fun feedRoutes(replyingKafkaTemplate: KafkaTemplate<String, String>, kafkaObject
                     kafkaProxy {
                         requestTopic = "feed-loadgrouppost-request"
                         kafkaTemplate = replyingKafkaTemplate
+                        sessionId = ((it.session().getAttribute("session-id") ?: "" )as String)
                         post =
                             kafkaObjectMapper.convertToMessageFromPathVariable("groupId" to it.pathVariable("groupId"))
                     }()
@@ -33,6 +35,7 @@ fun feedRoutes(replyingKafkaTemplate: KafkaTemplate<String, String>, kafkaObject
                     kafkaProxy {
                         requestTopic = "feed-loadprofilepost-request"
                         kafkaTemplate = replyingKafkaTemplate
+                        sessionId = ((it.session().getAttribute("session-id") ?: "" )as String)
                         post = kafkaObjectMapper.convertToMessageFrom {
                             pathVariable = mapOf("profileId" to it.pathVariable("profileId"))
                             param = mapOf(
@@ -46,6 +49,7 @@ fun feedRoutes(replyingKafkaTemplate: KafkaTemplate<String, String>, kafkaObject
                     kafkaProxy {
                         requestTopic = "feed-search-request"
                         kafkaTemplate = replyingKafkaTemplate
+                        sessionId = ((it.session().getAttribute("session-id") ?: "" )as String)
                         post = kafkaObjectMapper.convertToMessageFrom {
                             pathVariable = mapOf("profileId" to it.pathVariable("profileId"))
                             param = mapOf(
@@ -60,6 +64,7 @@ fun feedRoutes(replyingKafkaTemplate: KafkaTemplate<String, String>, kafkaObject
                 kafkaProxy {
                     requestTopic = "feed-search-request"
                     kafkaTemplate = replyingKafkaTemplate
+                    sessionId = ((it.session().getAttribute("session-id") ?: "" )as String)
                     post = kafkaObjectMapper.convertToMessageFrom {
                         pathVariable = mapOf("profileId" to it.pathVariable("profileId"))
                         param = mapOf(

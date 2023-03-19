@@ -1,16 +1,17 @@
 package com.example.servicechassis
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.example.AuthServerClient
 import org.example.CreateUserDto
 import org.example.UserFetched
 import org.springframework.boot.web.client.RestTemplateBuilder
-import org.springframework.http.HttpRequest
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
+import org.springframework.http.*
 import org.springframework.http.client.ClientHttpRequestExecution
 import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.http.client.ClientHttpResponse
+import org.springframework.util.LinkedMultiValueMap
+import org.springframework.util.MultiValueMap
 import org.springframework.web.client.ResponseErrorHandler
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.client.getForEntity
@@ -19,13 +20,35 @@ import java.util.*
 class AuthServerClientImpl(val authProp: AuthClientProp,
                            private val authClientResponseErrorHandler: AuthClientResponseErrorHandler): AuthServerClient {
 
-    var restTemplate: RestTemplate
+    var restTemplate: RestTemplate = RestTemplateBuilder()
+        .errorHandler(authClientResponseErrorHandler)
+        .build()
 
-    init {
-        println(authProp.authCode)
-        restTemplate = RestTemplateBuilder({
+    fun logIntoRealm() {
+        val restTemplate = RestTemplate()
+
+        val headers = HttpHeaders()
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED)
+
+        val map: MultiValueMap<String, String> = LinkedMultiValueMap()
+        map.add("grant_type", "password")
+        map.add("client_id", "admin-cli")
+        map.add("client_secret", "NDZhBV9OPqFMDsFwl1qKXnt0Mi0EU780")
+        map.add("username", "social_app_admin")
+        map.add("password", "social_app_admin")
+
+        val entity: HttpEntity<MultiValueMap<String, String>> = HttpEntity(map, headers)
+
+        val response = restTemplate.exchange(
+            "${authProp.host}auth/realms/SocialApp/protocol/openid-connect/token",
+            HttpMethod.POST,
+            entity,
+            RealmLogIn::class.java
+        )
+
+        this.restTemplate = RestTemplateBuilder({
             it.errorHandler = authClientResponseErrorHandler
-            it.interceptors.add(AuthClientInterceptor(authProp.authCode))
+            it.interceptors.add(AuthClientInterceptor(response.body!!.access_token))
         }).build()
     }
 
@@ -116,3 +139,14 @@ class AuthClientInterceptor(val authCode: String): ClientHttpRequestInterceptor 
         return execution.execute(request, body);
     }
 }
+
+data class RealmLogIn(
+    val access_token : String,
+    val expires_in : String,
+    val refresh_expires_in: Int,
+    val refresh_token: String,
+    val token_type: String,
+    @JsonProperty("not-before-policy") val notBeforePolicy: Int,
+    val session_state: String,
+    val scope: String
+)

@@ -23,10 +23,16 @@ data class MessageSync2<T>(var body: T)
 
 class KafkaObjectMapper(val objectMapper: ObjectMapper, val sessionStorage: SessionStorage) {
 
+    fun <T: Any> readBody(consumerRecord: ConsumerRecord<String, String>, klass: Class<T>): T =
+        readBody(consumerRecord.value(), klass)
+
     fun < T: Any> readBody(consumerRecord: String, klass: Class<T>): T {
         val str = objectMapper.readTree(consumerRecord)[BODY_KEY].toString()
         return objectMapper.readValue(str, klass)
     }
+
+    fun <T: Any> readParameter(consumerRecord: ConsumerRecord<String, String>, param: String, klass: Class<T>): T? =
+        readParameter(consumerRecord.value(), param, klass)
 
     fun <T: Any> readParameter(consumerRecord: String, param: String, klass: Class<T>): T? {
         val firstMap = objectMapper.readValue(consumerRecord, Map::class.java)
@@ -35,6 +41,9 @@ class KafkaObjectMapper(val objectMapper: ObjectMapper, val sessionStorage: Sess
         return objectMapper.readValue(secondMap as String, klass)
     }
 
+    fun readParameterUUID(consumerRecord: ConsumerRecord<String, String>, param: String): UUID =
+        readParameterUUID(consumerRecord.value(), param)
+
     fun readParameterUUID(consumerRecord: String, param: String): UUID {
         val firstMap = objectMapper.readValue(consumerRecord, Map::class.java)
         val secondMap = (firstMap[PARAM_KEY] as Map <String, String>)[param]
@@ -42,14 +51,18 @@ class KafkaObjectMapper(val objectMapper: ObjectMapper, val sessionStorage: Sess
     }
 
 
+    fun readPathVariable(consumerRecord: ConsumerRecord<String, String>, param: String): UUID =
+        readPathVariable(consumerRecord.value(), param)
     fun readPathVariable(consumerRecord: String, param: String): UUID {
         val firstMap = objectMapper.readTree(consumerRecord)[PATH_VARIABLE_KEY].toString()
         val secondMap = objectMapper.readValue(firstMap, Map::class.java)[param]
         return UUID.fromString(secondMap as String)
     }
 
+    fun readParamList(consumerRecord: ConsumerRecord<String, String>, param: String, klass: Class<*>): List<UUID> =
+        readParamList(consumerRecord.value(), param, klass)
 
-    fun <T> readParamList(consumerRecord: String, param: String, klass: Class<*>): List<UUID> {
+    fun readParamList(consumerRecord: String, param: String, klass: Class<*>): List<UUID> {
         val firstMap = objectMapper.readTree(consumerRecord)[PARAM_KEY].toString()
         val secondMap = objectMapper.readValue(firstMap, Map::class.java)[param] as String
         return secondMap
@@ -115,6 +128,10 @@ fun tryToResponse(funx: () -> String): String {
     return try {
         funx()
     } catch (e: Exception) {
-        e.message ?: FAILURE
+        return if(e.message != null) {
+            e.message!!
+        } else {
+            FAILURE
+        }
     }
 }

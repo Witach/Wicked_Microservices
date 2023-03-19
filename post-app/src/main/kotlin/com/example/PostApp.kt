@@ -82,6 +82,7 @@ fun main(args: Array<String>) {
                     bean<GroupListener>()
                     bean<PostListener>()
                     bean<KafkaObjectMapper>()
+                    bean<KafkaAnswerTemplate>()
                 }
             }
         )

@@ -1,4 +1,4 @@
-CREATE TABLE SPRING_SESSION (
+CREATE TABLE IF NOT EXISTS SPRING_SESSION (
                                 SESSION_ID CHAR(36) NOT NULL,
                                 CREATION_TIME BIGINT NOT NULL,
                                 LAST_ACCESS_TIME BIGINT NOT NULL,

@@ -21,7 +21,6 @@ class GroupServiceClientKafka(val replyingKafkaTemplate: ReplyingKafkaTemplate<S
         val response = kafkaProxyFeign {
             kafkaTemplate = replyingKafkaTemplate
             requestTopic = "group-get-request"
-            responseTopic = "group-get-response"
             post = kafkaObjectMapper.convertToMessageFromPathVariable("groupId" to groupId.toString())
         }()
         return kafkaObjectMapper.readBody(response, GroupProjection::class.java)
@@ -58,7 +57,6 @@ class GroupServiceClientKafka(val replyingKafkaTemplate: ReplyingKafkaTemplate<S
         val response = kafkaProxyFeign {
             kafkaTemplate = replyingKafkaTemplate
             requestTopic = "post-getall-request"
-            responseTopic = "post-getall-response"
             post = kafkaObjectMapper.convertToMessageFrom {
                 body = feedSearch
                 param = mapOf(PAGE to page, SIZE to size)
@@ -98,7 +96,6 @@ class ProfileServiceClientKafka(val replyingKafkaTemplate: ReplyingKafkaTemplate
         val response = kafkaProxyFeign {
             kafkaTemplate = replyingKafkaTemplate
             requestTopic = "profile-get-request"
-            responseTopic = "profile-get-response"
             post = kafkaObjectMapper.convertToMessageFromPathVariable("profileId" to profile.toString())
         }()
         return kafkaObjectMapper.readBody(response, ProfileProjection::class.java)

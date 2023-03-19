@@ -16,6 +16,7 @@ fun commentRoutes(replyingKafkaTemplate: KafkaTemplate<String, String>, kafkaObj
                 kafkaProxy {
                     requestTopic = "comment-create-request"
                     kafkaTemplate = replyingKafkaTemplate
+                    sessionId = ((it.session().getAttribute("session-id") ?: "" )as String)
                     post = kafkaObjectMapper.convertToMessageFromBodyObject(it.body())
                 } ()
             }
@@ -23,6 +24,7 @@ fun commentRoutes(replyingKafkaTemplate: KafkaTemplate<String, String>, kafkaObj
                 kafkaProxy {
                     requestTopic = "comment-delete-request"
                     kafkaTemplate = replyingKafkaTemplate
+                    sessionId = ((it.session().getAttribute("session-id") ?: "" )as String)
                     post = kafkaObjectMapper.convertToMessageFromPathVariable ("profileId" to it.pathVariable("profileId"))
                 } ()
             }
@@ -30,6 +32,7 @@ fun commentRoutes(replyingKafkaTemplate: KafkaTemplate<String, String>, kafkaObj
                 kafkaProxy {
                     requestTopic = "reply-create-request"
                     kafkaTemplate = replyingKafkaTemplate
+                    sessionId = ((it.session().getAttribute("session-id") ?: "" )as String)
                     post = kafkaObjectMapper.convertToMessageFrom {
                         pathVariable = mapOf(
                             "commentId" to it.pathVariable("commentId")
@@ -42,6 +45,7 @@ fun commentRoutes(replyingKafkaTemplate: KafkaTemplate<String, String>, kafkaObj
                 kafkaProxy {
                     requestTopic = "reply-edit-request"
                     kafkaTemplate = replyingKafkaTemplate
+                    sessionId = ((it.session().getAttribute("session-id") ?: "" )as String)
                     post = kafkaObjectMapper.convertToMessageFrom {
                         pathVariable = mapOf(
                             "commentId" to it.map("commentId").toString(),
@@ -55,6 +59,7 @@ fun commentRoutes(replyingKafkaTemplate: KafkaTemplate<String, String>, kafkaObj
                 kafkaProxy {
                     requestTopic = "reply-delete-request"
                     kafkaTemplate = replyingKafkaTemplate
+                    sessionId = ((it.session().getAttribute("session-id") ?: "" )as String)
                     post = kafkaObjectMapper.convertToMessageFrom {
                         pathVariable = mapOf(
                             "commentId" to it.map("commentId").toString(),

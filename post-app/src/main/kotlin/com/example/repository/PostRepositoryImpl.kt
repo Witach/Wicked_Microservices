@@ -28,7 +28,7 @@ class PostRepositoryImpl(private val postJpaRepository: PostJpaRepository, val m
 
     override fun findAllByIds(ids: List<UUID>): List<Post> {
         val aggregation = Aggregation.newAggregation(
-            Aggregation.match(Criteria.where("_id").`is`(ids)),
+            Aggregation.match(Criteria.where("_id").`in`(ids)),
             Aggregation.lookup("comments", "_id", "postId", "comments")
         ).withOptions(Aggregation.newAggregationOptions().allowDiskUse(true).build())
 

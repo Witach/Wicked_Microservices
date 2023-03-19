@@ -8,7 +8,7 @@ import org.springframework.kafka.annotation.KafkaListener
 import java.util.*
 
 
-class EventListeners(val profileService: ProfileService, val objectMapper: ObjectMapper, val imperativeSessionStorage: ImperativeSessionStorage) {
+open class EventListeners(val profileService: ProfileService, val objectMapper: ObjectMapper, val imperativeSessionStorage: ImperativeSessionStorage) {
 
     @KafkaListener(topics = ["profile-removed-event"])
     fun `profile-removed-event`(event: String) {

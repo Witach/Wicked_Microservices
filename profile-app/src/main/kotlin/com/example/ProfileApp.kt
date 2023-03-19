@@ -3,6 +3,7 @@ package com.example
 import com.example.configuration.EventListeners
 import com.example.configuration.Listeners
 import com.example.configuration.routes
+import com.example.service.LogginginCommand
 import com.example.service.ProfileService
 import com.example.service.UserService
 import com.example.servicechassis.*
@@ -24,6 +25,7 @@ fun main(args: Array<String>) {
             beans {
                 beanDefinitions(this)
                 bothKafka(this)
+                bean<LogginginCommand>()
                 profile("dev & feign") {
                     bean<EventPublisherMock>()
                     bean {
@@ -66,10 +68,13 @@ fun main(args: Array<String>) {
                 }
                 profile("kafka") {
                     bean<KafkaObjectMapper>()
-                    bean<Listeners>()
                     bean<EventListeners>()
                     bean {
                         ImperativeSessionStorage()
+                    }
+                    bean<Listeners>()
+                    bean {
+                        KafkaAnswerTemplate(ref(), ref())
                     }
                 }
             }

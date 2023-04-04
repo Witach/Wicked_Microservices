@@ -30,8 +30,10 @@ class GroupServiceClientImpl(val groupServiceFeignClient: GroupServiceFeignClien
     override fun loadPostsWitGroupPosts(page: Int, size: Int): List<PostProjection> {
 
         val profileData = profileServiceFeignClient.loadProfileData(sessionStorage.sessionOwner.userId!!)
-        return groupServiceFeignClient.loadPostsWitGroupPosts(profileData.followed.toMutableList(),
-            profileData.groups.toMutableList(), page, size)
+        val profileId = profileData.followed.toMutableList()
+        profileId.add(sessionStorage.sessionOwner.userId!!)
+        return groupServiceFeignClient.loadPostsWitGroupPosts(profileId,
+            profileData.groups.toList(), page, size)
     }
 }
 

@@ -9,7 +9,10 @@ import com.example.applicationservice.GroupService
 import com.example.applicationservice.PostService
 import com.example.servicechassis.map
 import com.example.servicechassis.paraMap
-import org.springframework.web.servlet.function.*
+import org.springframework.web.servlet.function.RouterFunction
+import org.springframework.web.servlet.function.ServerResponse
+import org.springframework.web.servlet.function.body
+import org.springframework.web.servlet.function.router
 import java.util.*
 
 fun routes(commentService: CommentService, groupPostService: GroupPostService,
@@ -81,7 +84,8 @@ fun routes(commentService: CommentService, groupPostService: GroupPostService,
                     groupPostService.getGroupPosts(
                         it.param("groupIds")
                             .map { it.split(",")
-                                .map { UUID.fromString(it) } }
+                                .filter { uuid -> uuid.isNotBlank() }
+                                .map { uuid -> UUID.fromString(uuid) } }
                             .orElse(emptyList()),
                     )
                 )
@@ -132,8 +136,9 @@ fun routes(commentService: CommentService, groupPostService: GroupPostService,
                 ServerResponse.ok().body(
                     postService.loadPostsPage(
                         ProfileToSearchForProjection(
-                            it.param("proj").map { it.split(",")
-                                .map { UUID.fromString(it) } }
+                            it.param("proj").map { list -> list.split(",")
+                                .filter { uuid -> uuid.isNotBlank() }
+                                .map { uuid -> UUID.fromString(uuid) } }
                                 .orElse(emptyList()),
                         ),
                         it.paraMap("page") ?: 0,
@@ -174,12 +179,16 @@ fun routes(commentService: CommentService, groupPostService: GroupPostService,
                     postService.loadAllPosts(
                         FeedSearch(
                             it.param("profiles")
-                                .map { it.split(",").map { UUID.fromString(it) } }
-                                .map { it.toSet()}
+                                .map { profile -> profile.split(",")
+                                    .filter { uuid -> uuid.isNotBlank() }
+                                    .map { uuid -> UUID.fromString(uuid) } }
+                                .map { x -> x.toSet()}
                                 .orElse(emptySet()),
                             it.param("groups")
-                                .map { it.split(",").map { UUID.fromString(it) } }
-                                .map { it.toSet()}
+                                .map { group -> group.split(",")
+                                    .filter { uuid -> uuid.isNotBlank() }
+                                    .map { uuid -> UUID.fromString(uuid) } }
+                                .map { x -> x.toSet()}
                                 .orElse(emptySet())
                         ),
                         it.paraMap("page") ?: 0,

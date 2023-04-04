@@ -4,9 +4,11 @@ import graphql.GraphQLContext
 import org.springframework.graphql.data.method.annotation.Argument
 import org.springframework.graphql.data.method.annotation.MutationMapping
 import org.springframework.stereotype.Controller
+import org.springframework.web.bind.annotation.CrossOrigin
 import java.util.*
 
 @Controller
+@CrossOrigin
 class CommentResolver(val commentService: PostAppService) {
 
     @MutationMapping

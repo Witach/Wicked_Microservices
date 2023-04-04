@@ -64,6 +64,16 @@ fun main(args: Array<String>) {
                     }
                 }
                 profile("grpc") {
+                    bean {
+                        routes(ref(), ref()).and(
+                            router {
+                                GET("/events") { req ->
+                                    val events = ref<EventPublisherMock>().listMap
+                                    ok().body(events)
+                                }
+                            }
+                        )
+                    }
                     bean<EventPublisherMock>()
                 }
                 profile("kafka") {
